@@ -2,6 +2,8 @@
 
 void ScanQInt(QInt & x)
 {
+	freopen("CON", "rt", stdin);
+
 	cout << "Enter QInt number :";
 	string number;
 	getline(cin, number);
@@ -13,25 +15,342 @@ void PrintQInt(QInt x)
 
 bool * DecToBin(QInt x)
 {
-	return nullptr;
+	int dem = 3;
+	int tmp = 127;
+	bool* result = new bool[128];
+	while ( dem >= 0 )
+	{
+		int dem1 = 31;
+		while ( dem1 >= 0 )
+		{
+			result[tmp] = ( x.data[dem] >> ( 31 - dem1 ) & 1 );
+			tmp--;
+			dem1--;
+		}
+		dem--;
+	}
+	return result;
 }
 
 QInt BinToDec(bool * bit)
 {
-	return QInt();
+	int dem = 0;
+	int i = 0;
+	QInt result;
+	if ( Length(bit) < 128 )
+	{
+		bool* tmp = new bool[128];
+		int j;
+		for ( j = 0; j < 128 - Length(bit); j++ )
+		{
+			tmp[j] = 0;
+		}
+		for ( int z = 0; z < Length(bit); z++ )
+		{
+			tmp[j] = bit[z];
+			j++;
+		}
+		bit = tmp;
+	}
+	while ( dem < 4 )
+	{
+		int dem1 = 0;
+		while ( dem1 < 32 )
+		{
+			result.data[dem] = result.data[dem] | bit[i] << ( 31 - dem1 );
+			dem1++;
+			i++;
+		}
+		dem++;
+	}
+	return result;
 }
 
 char * BinToHex(bool * bit)
 {
-	return nullptr;
+	char* result = new char[32];
+	bool Flag = 0;
+	int dem = 0;
+	if ( Length(bit) < 128 )
+	{
+		bool* tmp = new bool[128];
+		int j;
+		for ( j = 0; j < 128 - Length(bit); j++ )
+		{
+			tmp[j] = 0;
+		}
+		for ( int z = 0; z < Length(bit); z++ )
+		{
+			tmp[j] = bit[z];
+			j++;
+		}
+		bit = tmp;
+	}
+	int i = 0;
+	while ( i < 128 )
+	{
+		int tmp = 0;
+		for ( int j = 0; j < 4; j++ )
+		{
+			tmp += bit[i] * pow(2, 3 - j);
+			i++;
+		}
+		switch ( tmp )
+		{
+			case 0:
+				if ( Flag == 0 ) break;
+				else
+				{
+					result[dem] = '0';
+					dem++;
+				}
+				break;
+			case 1:
+				result[dem] = '1';
+				dem++;
+				Flag = 1;
+				break;
+			case 2:
+				result[dem] = '2';
+				dem++;
+				Flag = 1;
+				break;
+			case 3:
+				result[dem] = '3';
+				dem++;
+				Flag = 1;
+				break;
+			case 4:
+				result[dem] = '4';
+				dem++;
+				Flag = 1;
+				break;
+			case 5:
+				result[dem] = '5';
+				dem++;
+				Flag = 1;
+				break;
+			case 6:
+				result[dem] = '6';
+				dem++;
+				Flag = 1;
+				break;
+			case 7:
+				result[dem] = '7';
+				dem++;
+				Flag = 1;
+				break;
+			case 8:
+				result[dem] = '8';
+				dem++;
+				Flag = 1;
+				break;
+			case 9:
+				result[dem] = '9';
+				dem++;
+				Flag = 1;
+				break;
+			case 10:
+				result[dem] = 'A';
+				dem++;
+				Flag = 1;
+				break;
+			case 11:
+				result[dem] = 'B';
+				dem++;
+				Flag = 1;
+				break;
+			case 12:
+				result[dem] = 'C';
+				dem++;
+				Flag = 1;
+				break;
+			case 13:
+				result[dem] = 'D';
+				dem++;
+				Flag = 1;
+				break;
+			case 14:
+				result[dem] = 'E';
+				dem++;
+				Flag = 1;
+				break;
+			case 15:
+				result[dem] = 'F';
+				dem++;
+				Flag = 1;
+				break;
+		}
+	}
+	result[dem] = '\0';
+	return result;
 }
 
 char * DecToHex(QInt x)
 {
-	return nullptr;
+	return BinToHex(DecToBin(x));
+}
+
+QInt HexToDec(char * hex)
+{
+	return BinToDec(HexToBin(hex));
+}
+
+bool* HexToBin(char* hex)
+{
+	int dem = 0;
+	while ( hex[dem] != '\0' )
+	{
+		dem++;
+	}
+	bool* result = new bool[dem * 4];
+	int i = 0;
+	int index = 0;
+	while ( i < dem )
+	{
+		if ( hex[i] == '0' )
+		{
+			result[index] = 0;
+			result[index + 1] = 0;
+			result[index + 2] = 0;
+			result[index + 3] = 0;
+			index = index + 4;
+		}
+		else if ( hex[i] == '1' )
+		{
+			result[index] = 0;
+			result[index + 1] = 0;
+			result[index + 2] = 0;
+			result[index + 3] = 1;
+			index = index + 4;
+		}
+		if ( hex[i] == '2' )
+		{
+			result[index] = 0;
+			result[index + 1] = 0;
+			result[index + 2] = 1;
+			result[index + 3] = 0;
+			index = index + 4;
+		}
+		else if ( hex[i] == '3' )
+		{
+			result[index] = 0;
+			result[index + 1] = 0;
+			result[index + 2] = 1;
+			result[index + 3] = 1;
+			index = index + 4;
+		}
+		if ( hex[i] == '4' )
+		{
+			result[index] = 0;
+			result[index + 1] = 1;
+			result[index + 2] = 0;
+			result[index + 3] = 0;
+			index = index + 4;
+		}
+		else if ( hex[i] == '5' )
+		{
+			result[index] = 0;
+			result[index + 1] = 1;
+			result[index + 2] = 0;
+			result[index + 3] = 1;
+			index = index + 4;
+		}
+		if ( hex[i] == '6' )
+		{
+			result[index] = 0;
+			result[index + 1] = 1;
+			result[index + 2] = 1;
+			result[index + 3] = 0;
+			index = index + 4;
+		}
+		else if ( hex[i] == '7' )
+		{
+			result[index] = 0;
+			result[index + 1] = 1;
+			result[index + 2] = 1;
+			result[index + 3] = 1;
+			index = index + 4;
+		}
+		if ( hex[i] == '8' )
+		{
+			result[index] = 1;
+			result[index + 1] = 0;
+			result[index + 2] = 0;
+			result[index + 3] = 0;
+			index = index + 4;
+		}
+		else if ( hex[i] == '9' )
+		{
+			result[index] = 1;
+			result[index + 1] = 0;
+			result[index + 2] = 0;
+			result[index + 3] = 1;
+			index = index + 4;
+		}
+		if ( hex[i] == 'A' )
+		{
+			result[index] = 1;
+			result[index + 1] = 0;
+			result[index + 2] = 1;
+			result[index + 3] = 0;
+			index = index + 4;
+		}
+		else if ( hex[i] == 'B' )
+		{
+			result[index] = 1;
+			result[index + 1] = 0;
+			result[index + 2] = 1;
+			result[index + 3] = 1;
+			index = index + 4;
+		}
+		if ( hex[i] == 'C' )
+		{
+			result[index] = 1;
+			result[index + 1] = 1;
+			result[index + 2] = 0;
+			result[index + 3] = 0;
+			index = index + 4;
+		}
+		else if ( hex[i] == 'D' )
+		{
+			result[index] = 1;
+			result[index + 1] = 1;
+			result[index + 2] = 0;
+			result[index + 3] = 1;
+			index = index + 4;
+		}
+		if ( hex[i] == 'E' )
+		{
+			result[index] = 1;
+			result[index + 1] = 1;
+			result[index + 2] = 1;
+			result[index + 3] = 0;
+			index = index + 4;
+		}
+		else if ( hex[i] == 'F' )
+		{
+			result[index] = 1;
+			result[index + 1] = 1;
+			result[index + 2] = 1;
+			result[index + 3] = 1;
+			index = index + 4;
+		}
+		i++;
+	}
+	return result;
 }
 
 //--------------------------------------------------------------
+int Length(bool* arr)
+{
+	int i = 0;
+	while ( arr[i] == 0 || arr[i] == 1 )
+	{
+		i++;
+	}
+	return i;
+}
 
 int CharToNum(char c)
 {
@@ -118,6 +437,8 @@ void FileProcess(string inputFile)
 
 		//PrintQInt(result);
 	}
+
+	_fcloseall();
 }
 
 QInt Calculate(QInt A, QInt B, string operatorType)

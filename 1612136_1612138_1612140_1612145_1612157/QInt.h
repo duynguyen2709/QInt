@@ -9,7 +9,7 @@ using namespace std;
 class QInt
 {
 private:
-	_int32 data[4];
+
 	string number;
 
 	//************************************
@@ -21,7 +21,7 @@ private:
 	QInt splitNumber(string binary);
 
 public:
-
+	_int32 data[4];
 	QInt();
 	QInt(int base, string num);
 	~QInt();

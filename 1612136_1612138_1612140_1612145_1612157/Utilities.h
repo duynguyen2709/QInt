@@ -56,9 +56,27 @@ char * BinToHex(bool *bit);
 //************************************
 char * DecToHex(QInt x);
 
+//************************************
+// Method:    HexToDec
+// Returns:   QInt
+// Parameter: char * hex
+// Using :    Convert Hexadecimal to Decimal/QInt
+//************************************
+QInt HexToDec(char *hex);
+
+//************************************
+// Method:    HexToBin
+// Returns:   bool*
+// Parameter: char * hex
+// Using :    Convert hexadecimal to Array of Boolean
+//************************************
+bool* HexToBin(char* hex);
+
 //----------------------------------------------------------------------------
 //-- UTILITIES FUNCTIONS
 //----------------------------------------------------------------------------
+
+int Length(bool* arr);
 
 //************************************
 // Method:    CharToNum
@@ -88,7 +106,7 @@ string DivideByTwo(string str);
 // Method:    DecToBin
 // Returns:   std::string
 // Parameter: string str
-// Using :    Convert Big Integer to Binary string
+// Using :    Convert Decimal to Binary string
 //************************************
 string DecToBin(string str);
 
