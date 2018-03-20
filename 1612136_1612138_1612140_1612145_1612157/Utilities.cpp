@@ -11,13 +11,30 @@ void ScanQInt(QInt & x)
 }
 
 void PrintQInt(QInt x)
-{}
+{
+	string result = "0";
+
+	bool * arr = DecToBin(x);
+	string binary = "";
+	for ( int i = 0; i < MAX_BIT_LENGTH; i++ )
+	{
+		binary += ( arr[i] == 1 ) ? "1" : "0";
+	}
+
+	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
+	{
+		if ( binary[i] == '1' )
+			result = Add(result, MultiplyByTwo("1", MAX_BIT_LENGTH - i - 1));
+	}
+
+	cout << result;
+}
 
 bool * DecToBin(QInt x)
 {
 	int dem = 3;
-	int tmp = 127;
-	bool* result = new bool[128];
+	int tmp = MAX_BIT_LENGTH - 1;
+	bool* result = new bool[MAX_BIT_LENGTH];
 	while ( dem >= 0 )
 	{
 		int dem1 = 31;
@@ -37,11 +54,11 @@ QInt BinToDec(bool * bit)
 	int dem = 0;
 	int i = 0;
 	QInt result;
-	if ( Length(bit) < 128 )
+	if ( Length(bit) < MAX_BIT_LENGTH )
 	{
-		bool* tmp = new bool[128];
+		bool* tmp = new bool[MAX_BIT_LENGTH];
 		int j;
-		for ( j = 0; j < 128 - Length(bit); j++ )
+		for ( j = 0; j < MAX_BIT_LENGTH - Length(bit); j++ )
 		{
 			tmp[j] = 0;
 		}
@@ -71,11 +88,11 @@ char * BinToHex(bool * bit)
 	char* result = new char[32];
 	bool Flag = 0;
 	int dem = 0;
-	if ( Length(bit) < 128 )
+	if ( Length(bit) < MAX_BIT_LENGTH )
 	{
-		bool* tmp = new bool[128];
+		bool* tmp = new bool[MAX_BIT_LENGTH];
 		int j;
-		for ( j = 0; j < 128 - Length(bit); j++ )
+		for ( j = 0; j < MAX_BIT_LENGTH - Length(bit); j++ )
 		{
 			tmp[j] = 0;
 		}
@@ -87,7 +104,7 @@ char * BinToHex(bool * bit)
 		bit = tmp;
 	}
 	int i = 0;
-	while ( i < 128 )
+	while ( i < MAX_BIT_LENGTH )
 	{
 		int tmp = 0;
 		for ( int j = 0; j < 4; j++ )
@@ -352,11 +369,6 @@ int Length(bool* arr)
 	return i;
 }
 
-int CharToNum(char c)
-{
-	return c - '0';
-}
-
 int CheckOddDigit(char c)
 {
 	return ( c == '1' || c == '3' || c == '5' || c == '7' || c == '9' ) ? 1 : 0;
@@ -410,13 +422,13 @@ string DecToBin(string str)
 
 }
 
-bool * StringToBinary(string str)
+bool * StringToBinary(string binaryString)
 {
-	bool * result = new bool[str.length()];
+	bool * result = new bool[binaryString.length()];
 
-	for ( int i = 0; i < str.length(); i++ )
+	for ( int i = 0; i < binaryString.length(); i++ )
 	{
-		if ( (char) str[i] == '1' )
+		if ( (char) binaryString[i] == '1' )
 			result[i] = 1;
 		else result[i] = 0;
 	}
@@ -439,6 +451,45 @@ void FileProcess(string inputFile)
 	}
 
 	_fcloseall();
+}
+
+QInt InputProcess(string str)
+{
+	QInt result;
+	int spaceCount = std::count(str.begin(), str.end(), ' ');
+
+	size_t firstSpace = str.find_first_of(' ');
+	size_t secondSpace = str.find(' ', firstSpace + 1);
+
+	int p1 = stoi(str.substr(0, firstSpace));
+
+	if ( spaceCount == 2 )
+	{
+		//converting from base p1 to p2
+		int p2 = stoi(str.substr(firstSpace + 1, secondSpace - firstSpace - 1));
+
+		string number = str.substr(secondSpace + 1);
+
+		QInt A(p1, number);
+
+	}
+	else
+	{
+		//calculate with operator
+		size_t thirdSpace = str.find(' ', secondSpace + 1);
+
+		string numberA = str.substr(firstSpace + 1, secondSpace - firstSpace - 1);
+		string numberB = str.substr(thirdSpace + 1);
+
+		string operatorType = str.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
+
+		QInt A(p1, numberA);
+		QInt B(p1, numberB);
+
+		result = Calculate(A, B, operatorType);
+	}
+	return result;
+
 }
 
 QInt Calculate(QInt A, QInt B, string operatorType)
@@ -484,40 +535,83 @@ QInt Calculate(QInt A, QInt B, string operatorType)
 	return result;
 }
 
-QInt InputProcess(string str)
+int CharToNum(char c)
 {
-	QInt result;
-	int spaceCount = std::count(str.begin(), str.end(), ' ');
+	return c - '0';
+}
 
-	size_t firstSpace = str.find_first_of(' ');
-	size_t secondSpace = str.find(' ', firstSpace + 1);
+string AddDigit0(int length)
+{
+	string str = "";
+	for ( int i = 0; i < length; i++ )
+		str += "0";
+	return str;
+}
 
-	int p1 = stoi(str.substr(0, firstSpace));
+string Add(string numberA, string numberB)
+{
+	string result = "";
 
-	if ( spaceCount == 2 )
-	{
-		//converting from base p1 to p2
-		int p2 = stoi(str.substr(firstSpace + 1, secondSpace - firstSpace - 1));
+	int lengthA = numberA.length();
+	int lenghtB = numberB.length();
 
-		string number = str.substr(secondSpace + 1);
-
-		QInt A(p1, number);
-
-	}
+	if ( lengthA < lenghtB )
+		numberA = AddDigit0(lenghtB - lengthA) + numberA;
 	else
+		numberB = AddDigit0(lengthA - lenghtB) + numberB;
+
+	lengthA = lenghtB = numberA.length();
+	bool remainder = false;
+
+	for ( int i = lengthA - 1; i >= 0; i-- )
 	{
-		//calculate with operator
-		size_t thirdSpace = str.find(' ', secondSpace + 1);
+		int c = CharToNum(numberA[i]) + CharToNum(numberB[i]);
 
-		string numberA = str.substr(firstSpace + 1, secondSpace - firstSpace - 1);
-		string numberB = str.substr(thirdSpace + 1);
+		if ( remainder )
+			c += 1;
 
-		string operatorType = str.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
+		if ( c >= 10 )
+		{
+			remainder = true;
+			c %= 10;
+		}
+		else remainder = false;
 
-		QInt A(p1, numberA);
-		QInt B(p1, numberB);
+		result = (char) ( c + '0' ) + result;
+	}
 
-		result = Calculate(A, B, operatorType);
+	if ( remainder )
+		result = "1" + result;
+
+	return result;
+}
+
+string MultiplyByTwo(string number, int times)
+{
+	for ( int i = 0; i < times; i++ )
+	{
+		number = Add(number, number);
+	}
+	return number;
+}
+
+string DataToDec(QInt A)
+{
+	string result = "0";
+
+	//convert to binary
+	bool * arr = DecToBin(A);
+	string binary = "";
+	for ( int i = 0; i < MAX_BIT_LENGTH; i++ )
+	{
+		binary += ( arr[i] == 1 ) ? "1" : "0";
+	}
+
+	//convert to big int
+	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
+	{
+		if ( binary[i] == '1' )
+			result = Add(result, MultiplyByTwo("1", MAX_BIT_LENGTH - i - 1));
 	}
 	return result;
 

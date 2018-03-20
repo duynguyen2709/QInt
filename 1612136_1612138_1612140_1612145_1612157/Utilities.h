@@ -6,6 +6,9 @@
 #include "QInt.h"
 
 using namespace std;
+
+#define MAX_BIT_LENGTH 128
+
 class QInt;
 
 //************************************
@@ -144,4 +147,9 @@ QInt InputProcess(string str);
 //************************************
 QInt Calculate(QInt A, QInt B, string operatorType);
 
+string Add(string numberA, string numberB);
+
+string MultiplyByTwo(string number, int times);
+
+string DataToDec(QInt A);
 #endif // !_UTILITIES_H_

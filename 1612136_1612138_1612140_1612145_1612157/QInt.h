@@ -10,8 +10,6 @@ class QInt
 {
 private:
 
-	string number;
-
 	//************************************
 	// Method:    splitNumber
 	// Returns:   QInt
@@ -24,6 +22,7 @@ public:
 	_int32 data[4];
 	QInt();
 	QInt(int base, string num);
+	string DataToString();
 	~QInt();
 
 	QInt operator+(const QInt &A);

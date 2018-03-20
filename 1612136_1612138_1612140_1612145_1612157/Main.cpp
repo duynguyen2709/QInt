@@ -17,5 +17,7 @@ int main()
 {
 	//FileProcess("INPUT.TXT");
 
+	QInt A(2, "111010110111100110100010101");
+	cout << DataToDec(A) << endl;
 	return 0;
 }
