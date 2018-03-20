@@ -3,21 +3,17 @@
 
 using namespace std;
 
-void PrintBoolArray(bool *arr, int length)
-{
-	for ( int i = 0; i < length; i++ )
-	{
-		if ( arr[i] == 1 )
-			cout << 1;
-		else cout << 0;
-	}
-	cout << endl;
-}
 int main()
 {
-	//FileProcess("INPUT.TXT");
+	Utilities MainController;
+	MainController.FileProcess("INPUT.TXT");
 
-	QInt A(2, "111010110111100110100010101");
-	cout << DataToDec(A) << endl;
+	QInt A(2, "1001011010100101000100010111110");
+	QInt B(10, "1263700158");
+
+	if ( A == B )
+		cout << "=" << endl;
+	else cout << "!=" << endl;
+
 	return 0;
 }

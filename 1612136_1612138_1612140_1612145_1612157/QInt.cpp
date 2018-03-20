@@ -1,7 +1,7 @@
 #include "QInt.h"
 #include "Utilities.h"
 
-QInt QInt::splitNumber(string binary)
+QInt QInt::SplitNumber(string binary)
 {
 	QInt result;
 
@@ -36,39 +36,39 @@ QInt::QInt()
 
 QInt::QInt(int base, string num)
 {
+	Utilities A;
+
 	for ( size_t i = 0; i < 4; i++ )
 	{
 		data[i] = 0;
 	}
 	if ( base == 10 )
 	{
-		*this = splitNumber(DecToBin(num));
+		*this = SplitNumber(A.DecToBin(num));
 	}
 	else if ( base == 2 )
 	{
-		//*this = splitNumber(num);
-		*this = BinToDec(StringToBinary(num));
+		*this = A.BinToDec(A.StringToBinary(num));
 	}
 	else if ( base == 16 )
 	{
+		*this = A.HexToDec((char *) num.c_str());
 	}
 
-}
-
-string QInt::DataToString()
-{
-	bool * arr = DecToBin(*this);
-	string result = "";
-	for ( int i = 0; i < MAX_BIT_LENGTH; i++ )
-	{
-		result += ( arr[i] == 1 ) ? "1" : "0";
-	}
-
-	return result;
 }
 
 QInt::~QInt()
 {}
+
+bool QInt::operator==(const QInt & A)
+{
+	for ( int i = 3; i >= 0; i-- )
+	{
+		if ( A.data[i] != data[i] )
+			return false;
+	}
+	return true;
+}
 
 QInt QInt::operator+(const QInt & A)
 {

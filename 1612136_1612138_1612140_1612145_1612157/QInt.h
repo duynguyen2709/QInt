@@ -9,21 +9,23 @@ using namespace std;
 class QInt
 {
 private:
+	_int32 data[4];
 
 	//************************************
 	// Method:    splitNumber
 	// Returns:   QInt
 	// Parameter: string binary
-	// Using :    Split binary string to 4 integer
+	// Using :    Split big integer to 4 32bit-integers
 	//************************************
-	QInt splitNumber(string binary);
+	QInt SplitNumber(string binary);
 
 public:
-	_int32 data[4];
+
 	QInt();
 	QInt(int base, string num);
-	string DataToString();
+
 	~QInt();
+	bool operator==(const QInt &A);
 
 	QInt operator+(const QInt &A);
 	QInt operator-(const QInt &A);
@@ -38,6 +40,7 @@ public:
 	QInt operator<<(const QInt &A);
 	QInt operator >> (const QInt &A);
 
+	friend class Utilities;
 };
 
 #endif

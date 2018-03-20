@@ -1,6 +1,6 @@
 #include "Utilities.h"
 
-void ScanQInt(QInt & x)
+void Utilities::ScanQInt(QInt & x)
 {
 	freopen("CON", "rt", stdin);
 
@@ -10,7 +10,7 @@ void ScanQInt(QInt & x)
 	x = *( new QInt(10, number) );
 }
 
-void PrintQInt(QInt x)
+void Utilities::PrintQInt(QInt x)
 {
 	string result = "0";
 
@@ -30,73 +30,76 @@ void PrintQInt(QInt x)
 	cout << result;
 }
 
-bool * DecToBin(QInt x)
+bool * Utilities::DecToBin(QInt x)
 {
-	int dem = 3;
+	int dataPos = 3;
+
 	int tmp = MAX_BIT_LENGTH - 1;
+
 	bool* result = new bool[MAX_BIT_LENGTH];
-	while ( dem >= 0 )
+	while ( dataPos >= 0 )
 	{
-		int dem1 = 31;
-		while ( dem1 >= 0 )
+		int bitPos = 31;
+		while ( bitPos >= 0 )
 		{
-			result[tmp] = ( x.data[dem] >> ( 31 - dem1 ) & 1 );
+			result[tmp] = ( x.data[dataPos] >> ( 31 - bitPos ) & 1 );
 			tmp--;
-			dem1--;
+			bitPos--;
 		}
-		dem--;
+		dataPos--;
 	}
 	return result;
 }
 
-QInt BinToDec(bool * bit)
+QInt Utilities::BinToDec(bool * bit)
 {
-	int dem = 0;
+	int dataPos = 0;
 	int i = 0;
 	QInt result;
-	if ( Length(bit) < MAX_BIT_LENGTH )
+
+	if ( LengthOfBoolArray(bit) < MAX_BIT_LENGTH )
 	{
 		bool* tmp = new bool[MAX_BIT_LENGTH];
 		int j;
-		for ( j = 0; j < MAX_BIT_LENGTH - Length(bit); j++ )
+		for ( j = 0; j < MAX_BIT_LENGTH - LengthOfBoolArray(bit); j++ )
 		{
 			tmp[j] = 0;
 		}
-		for ( int z = 0; z < Length(bit); z++ )
+		for ( int z = 0; z < LengthOfBoolArray(bit); z++ )
 		{
 			tmp[j] = bit[z];
 			j++;
 		}
 		bit = tmp;
 	}
-	while ( dem < 4 )
+	while ( dataPos < 4 )
 	{
-		int dem1 = 0;
-		while ( dem1 < 32 )
+		int bitPos = 0;
+		while ( bitPos < 32 )
 		{
-			result.data[dem] = result.data[dem] | bit[i] << ( 31 - dem1 );
-			dem1++;
+			result.data[dataPos] = result.data[dataPos] | bit[i] << ( 31 - bitPos );
+			bitPos++;
 			i++;
 		}
-		dem++;
+		dataPos++;
 	}
 	return result;
 }
 
-char * BinToHex(bool * bit)
+char * Utilities::BinToHex(bool * bit)
 {
 	char* result = new char[32];
-	bool Flag = 0;
-	int dem = 0;
-	if ( Length(bit) < MAX_BIT_LENGTH )
+	bool flag = 0;
+	int count = 0;
+	if ( LengthOfBoolArray(bit) < MAX_BIT_LENGTH )
 	{
 		bool* tmp = new bool[MAX_BIT_LENGTH];
 		int j;
-		for ( j = 0; j < MAX_BIT_LENGTH - Length(bit); j++ )
+		for ( j = 0; j < MAX_BIT_LENGTH - LengthOfBoolArray(bit); j++ )
 		{
 			tmp[j] = 0;
 		}
-		for ( int z = 0; z < Length(bit); z++ )
+		for ( int z = 0; z < LengthOfBoolArray(bit); z++ )
 		{
 			tmp[j] = bit[z];
 			j++;
@@ -115,115 +118,67 @@ char * BinToHex(bool * bit)
 		switch ( tmp )
 		{
 			case 0:
-				if ( Flag == 0 ) break;
-				else
-				{
-					result[dem] = '0';
-					dem++;
-				}
+				if ( flag == 0 ) break;
+				result[count++] = tmp + '0';
 				break;
 			case 1:
-				result[dem] = '1';
-				dem++;
-				Flag = 1;
-				break;
 			case 2:
-				result[dem] = '2';
-				dem++;
-				Flag = 1;
-				break;
 			case 3:
-				result[dem] = '3';
-				dem++;
-				Flag = 1;
-				break;
 			case 4:
-				result[dem] = '4';
-				dem++;
-				Flag = 1;
-				break;
 			case 5:
-				result[dem] = '5';
-				dem++;
-				Flag = 1;
-				break;
 			case 6:
-				result[dem] = '6';
-				dem++;
-				Flag = 1;
-				break;
 			case 7:
-				result[dem] = '7';
-				dem++;
-				Flag = 1;
-				break;
 			case 8:
-				result[dem] = '8';
-				dem++;
-				Flag = 1;
-				break;
 			case 9:
-				result[dem] = '9';
-				dem++;
-				Flag = 1;
+				result[count++] = tmp + '0';
 				break;
 			case 10:
-				result[dem] = 'A';
-				dem++;
-				Flag = 1;
+				result[count++] = 'A';
 				break;
 			case 11:
-				result[dem] = 'B';
-				dem++;
-				Flag = 1;
+				result[count++] = 'B';
 				break;
 			case 12:
-				result[dem] = 'C';
-				dem++;
-				Flag = 1;
+				result[count++] = 'C';
 				break;
 			case 13:
-				result[dem] = 'D';
-				dem++;
-				Flag = 1;
+				result[count++] = 'D';
 				break;
 			case 14:
-				result[dem] = 'E';
-				dem++;
-				Flag = 1;
+				result[count++] = 'E';
 				break;
 			case 15:
-				result[dem] = 'F';
-				dem++;
-				Flag = 1;
+				result[count++] = 'F';
 				break;
 		}
+		if ( tmp != 0 )
+			flag = 1;
 	}
-	result[dem] = '\0';
+	result[count] = '\0';
 	return result;
 }
 
-char * DecToHex(QInt x)
+char * Utilities::DecToHex(QInt x)
 {
 	return BinToHex(DecToBin(x));
 }
 
-QInt HexToDec(char * hex)
+QInt Utilities::HexToDec(char * hex)
 {
 	return BinToDec(HexToBin(hex));
 }
 
-bool* HexToBin(char* hex)
+bool* Utilities::HexToBin(char* hex)
 {
-	int dem = 0;
-	while ( hex[dem] != '\0' )
+	int count = 0;
+	while ( hex[count] != '\0' )
 	{
-		dem++;
+		count++;
 	}
-	bool* result = new bool[dem * 4];
+	bool* result = new bool[count * 4];
 	int i = 0;
 	int index = 0;
-	while ( i < dem )
+	while ( i < count )
 	{
 		if ( hex[i] == '0' )
 		{
@@ -231,7 +186,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 0;
 			result[index + 2] = 0;
 			result[index + 3] = 0;
-			index = index + 4;
+
 		}
 		else if ( hex[i] == '1' )
 		{
@@ -239,7 +194,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 0;
 			result[index + 2] = 0;
 			result[index + 3] = 1;
-			index = index + 4;
+
 		}
 		if ( hex[i] == '2' )
 		{
@@ -247,7 +202,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 0;
 			result[index + 2] = 1;
 			result[index + 3] = 0;
-			index = index + 4;
+
 		}
 		else if ( hex[i] == '3' )
 		{
@@ -255,7 +210,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 0;
 			result[index + 2] = 1;
 			result[index + 3] = 1;
-			index = index + 4;
+
 		}
 		if ( hex[i] == '4' )
 		{
@@ -263,7 +218,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 1;
 			result[index + 2] = 0;
 			result[index + 3] = 0;
-			index = index + 4;
+
 		}
 		else if ( hex[i] == '5' )
 		{
@@ -271,7 +226,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 1;
 			result[index + 2] = 0;
 			result[index + 3] = 1;
-			index = index + 4;
+
 		}
 		if ( hex[i] == '6' )
 		{
@@ -279,7 +234,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 1;
 			result[index + 2] = 1;
 			result[index + 3] = 0;
-			index = index + 4;
+
 		}
 		else if ( hex[i] == '7' )
 		{
@@ -287,7 +242,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 1;
 			result[index + 2] = 1;
 			result[index + 3] = 1;
-			index = index + 4;
+
 		}
 		if ( hex[i] == '8' )
 		{
@@ -295,7 +250,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 0;
 			result[index + 2] = 0;
 			result[index + 3] = 0;
-			index = index + 4;
+
 		}
 		else if ( hex[i] == '9' )
 		{
@@ -303,7 +258,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 0;
 			result[index + 2] = 0;
 			result[index + 3] = 1;
-			index = index + 4;
+
 		}
 		if ( hex[i] == 'A' )
 		{
@@ -311,7 +266,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 0;
 			result[index + 2] = 1;
 			result[index + 3] = 0;
-			index = index + 4;
+
 		}
 		else if ( hex[i] == 'B' )
 		{
@@ -319,7 +274,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 0;
 			result[index + 2] = 1;
 			result[index + 3] = 1;
-			index = index + 4;
+
 		}
 		if ( hex[i] == 'C' )
 		{
@@ -327,7 +282,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 1;
 			result[index + 2] = 0;
 			result[index + 3] = 0;
-			index = index + 4;
+
 		}
 		else if ( hex[i] == 'D' )
 		{
@@ -335,7 +290,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 1;
 			result[index + 2] = 0;
 			result[index + 3] = 1;
-			index = index + 4;
+
 		}
 		if ( hex[i] == 'E' )
 		{
@@ -343,7 +298,7 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 1;
 			result[index + 2] = 1;
 			result[index + 3] = 0;
-			index = index + 4;
+
 		}
 		else if ( hex[i] == 'F' )
 		{
@@ -351,15 +306,22 @@ bool* HexToBin(char* hex)
 			result[index + 1] = 1;
 			result[index + 2] = 1;
 			result[index + 3] = 1;
-			index = index + 4;
+
 		}
+		index += 4;
 		i++;
 	}
 	return result;
 }
 
-//--------------------------------------------------------------
-int Length(bool* arr)
+/*----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+//-- UTILITIES FUNCTIONS
+//----------------------------------------------------------------------------
+----------------------------------------------------------------------------*/
+
+int Utilities::LengthOfBoolArray(bool* arr)
 {
 	int i = 0;
 	while ( arr[i] == 0 || arr[i] == 1 )
@@ -369,12 +331,42 @@ int Length(bool* arr)
 	return i;
 }
 
-int CheckOddDigit(char c)
+string Utilities::BoolArrayToString(bool *arr, int length)
+{
+	string result = "";
+	for ( int i = 0; i < length; i++ )
+	{
+		if ( arr[i] == 1 )
+			result += "1";
+		else result += "0";
+	}
+	return result;
+}
+
+int Utilities::CharToNum(char c)
+{
+	return c - '0';
+}
+
+int Utilities::CheckOddDigit(char c)
 {
 	return ( c == '1' || c == '3' || c == '5' || c == '7' || c == '9' ) ? 1 : 0;
 }
 
-string DivideByTwo(string str)
+string Utilities::Trim0AtFirst(string binary)
+{
+	if ( binary != "0" )
+	{
+		int pos = binary.find_first_of('1');
+		if ( pos != string::npos )
+		{
+			binary = binary.substr(pos);
+		}
+	}
+	return binary;
+}
+
+string Utilities::DivideByTwo(string str)
 {
 	string result = "";
 
@@ -400,7 +392,7 @@ string DivideByTwo(string str)
 	return result;
 }
 
-string DecToBin(string str)
+string Utilities::DecToBin(string str)
 {
 	string result = "";
 
@@ -422,7 +414,7 @@ string DecToBin(string str)
 
 }
 
-bool * StringToBinary(string binaryString)
+bool * Utilities::StringToBinary(string binaryString)
 {
 	bool * result = new bool[binaryString.length()];
 
@@ -436,7 +428,7 @@ bool * StringToBinary(string binaryString)
 	return result;
 }
 
-void FileProcess(string inputFile)
+void Utilities::FileProcess(string inputFile)
 {
 	freopen(inputFile.c_str(), "rt", stdin);
 
@@ -445,17 +437,55 @@ void FileProcess(string inputFile)
 		string str;
 		getline(cin, str);
 
-		QInt result = InputProcess(str);
+		cout << InputProcess(str) << endl;
 
-		//PrintQInt(result);
 	}
 
 	_fcloseall();
 }
 
-QInt InputProcess(string str)
+string Utilities::Convert(int p1, int p2, string number)
 {
-	QInt result;
+	QInt A(p1, number);
+
+	string result = "";
+
+	switch ( p1 )
+	{
+		case 2:
+			if ( p2 == 10 )
+				result = DataToDec(A);
+			else if ( p2 == 16 )
+				result = BinToHex(DecToBin(A));
+			break;
+
+		case 10:
+			if ( p2 == 2 )
+				result = Trim0AtFirst(BoolArrayToString(DecToBin(A), LengthOfBoolArray(DecToBin(A))));
+			else if ( p2 == 16 )
+				result = DecToHex(A);
+			break;
+
+		case 16:
+			if ( p2 == 2 )
+			{
+				char *hex = DecToHex(A);
+				result = Trim0AtFirst(BoolArrayToString(HexToBin(hex), LengthOfBoolArray(HexToBin(hex))));
+
+			}
+			else if ( p2 == 10 )
+				result = DataToDec(A);
+			break;
+
+	}
+
+	return result;
+}
+
+string Utilities::InputProcess(string str)
+{
+	string result = "";
+
 	int spaceCount = std::count(str.begin(), str.end(), ' ');
 
 	size_t firstSpace = str.find_first_of(' ');
@@ -470,29 +500,24 @@ QInt InputProcess(string str)
 
 		string number = str.substr(secondSpace + 1);
 
-		QInt A(p1, number);
-
+		result = Convert(p1, p2, number);
 	}
 	else
 	{
 		//calculate with operator
-		size_t thirdSpace = str.find(' ', secondSpace + 1);
+		/*size_t thirdSpace = str.find(' ', secondSpace + 1);
 
 		string numberA = str.substr(firstSpace + 1, secondSpace - firstSpace - 1);
 		string numberB = str.substr(thirdSpace + 1);
 
 		string operatorType = str.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
 
-		QInt A(p1, numberA);
-		QInt B(p1, numberB);
-
-		result = Calculate(A, B, operatorType);
+		Calculate(A, B, operatorType);*/
 	}
 	return result;
-
 }
 
-QInt Calculate(QInt A, QInt B, string operatorType)
+QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 {
 	QInt result;
 
@@ -535,12 +560,7 @@ QInt Calculate(QInt A, QInt B, string operatorType)
 	return result;
 }
 
-int CharToNum(char c)
-{
-	return c - '0';
-}
-
-string AddDigit0(int length)
+string Utilities::AddDigit0(int length)
 {
 	string str = "";
 	for ( int i = 0; i < length; i++ )
@@ -548,7 +568,7 @@ string AddDigit0(int length)
 	return str;
 }
 
-string Add(string numberA, string numberB)
+string Utilities::Add(string numberA, string numberB)
 {
 	string result = "";
 
@@ -586,7 +606,7 @@ string Add(string numberA, string numberB)
 	return result;
 }
 
-string MultiplyByTwo(string number, int times)
+string Utilities::MultiplyByTwo(string number, int times)
 {
 	for ( int i = 0; i < times; i++ )
 	{
@@ -595,7 +615,7 @@ string MultiplyByTwo(string number, int times)
 	return number;
 }
 
-string DataToDec(QInt A)
+string Utilities::DataToDec(QInt A)
 {
 	string result = "0";
 
