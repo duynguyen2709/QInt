@@ -44,11 +44,20 @@ QInt::QInt(int base, string num)
 	}
 	if ( base == 10 )
 	{
-		*this = SplitNumber(A.DecToBin(num));
+		if ( num[0] != '-' )
+			*this = SplitNumber(A.DecToBin(num));
+		else
+		{
+			*this = SplitNumber(A.DecToBin(num.substr(1)));
+			data[0] = data[0] | 1 << 31;
+		}
 	}
 	else if ( base == 2 )
 	{
-		*this = A.BinToDec(A.StringToBinary(num));
+		if ( num.length() <= MAX_BIT_LENGTH )
+			*this = A.BinToDec(A.StringToBinary(num));
+
+		else cout << "Overflow" << endl;
 	}
 	else if ( base == 16 )
 	{
@@ -72,12 +81,75 @@ bool QInt::operator==(const QInt & A)
 
 QInt QInt::operator+(const QInt & A)
 {
-	return QInt();
+	QInt result;
+
+	int nho = 0;
+	for ( int i = 0; i < 32 * 4; i++ )
+	{
+		int o = 3 - i / 32;
+		int k = i % 32;
+		int a1, b1;
+		a1 = A.data[o] >> k & 1;
+		b1 = data[o] >> k & 1;
+		if ( ( i == 127 ) && ( nho + a1 + b1 >= 2 ) )
+		{
+			cout << "Stackoverflow!!!!!!!";
+		}
+
+		if ( a1 == 0 && b1 == 0 && ( nho == 1 ) )
+		{
+			nho = 0;
+			result.data[o] = 1 << k | result.data[o];
+			continue;
+		}
+
+		if ( a1 == 0 && b1 == 0 && ( nho == 1 ) )
+		{
+			nho = 1;
+			result.data[o] = 1 << k | result.data[o];
+			continue;
+		}
+		if ( a1 == 1 && b1 == 1 && ( nho == 0 ) )
+		{
+			nho = 1;
+			result.data[o] = 0 << k | result.data[o];
+			continue;
+		}
+		if ( a1 == 1 && b1 == 1 && ( nho == 1 ) )
+		{
+			nho = 1;
+			result.data[o] = 1 << k | result.data[o];
+			continue;
+		}
+		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && nho == 1 )
+		{
+			nho = 1;
+			result.data[o] = 0 << k | result.data[o];
+			continue;
+		}
+		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && nho == 0 )
+		{
+			nho = 0;
+			result.data[o] = 1 << k | result.data[o];
+			continue;
+		}
+
+	}
+
+	return result;
+
 }
 
 QInt QInt::operator-(const QInt & A)
 {
-	return QInt();
+	QInt result;
+	QInt notA = A;
+	~notA;
+	QInt add1(10, "1");
+	notA = notA + add1;
+	result = *this + notA;
+	return result;
+
 }
 
 QInt QInt::operator*(const QInt & A)
@@ -107,7 +179,10 @@ QInt QInt::operator^(const QInt & A)
 
 QInt QInt::operator~()
 {
-	return QInt();
+	for ( int i = 0; i < 4; i++ )
+		data[i] = ~data[i];
+
+	return ( *this );
 }
 
 QInt QInt::operator<<(const QInt & A)

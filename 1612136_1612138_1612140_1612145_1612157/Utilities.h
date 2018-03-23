@@ -91,18 +91,18 @@ public:
 	//************************************
 	bool* HexToBin(char* hex);
 
-private:
+	//private:
 
-	//----------------------------------------------------------------------------
-	//-- UTILITIES FUNCTIONS
-	//----------------------------------------------------------------------------
+		//----------------------------------------------------------------------------
+		//-- UTILITIES FUNCTIONS
+		//----------------------------------------------------------------------------
 
-	//************************************
-	// Method:    InputProcess
-	// Returns:   std::string
-	// Parameter: string str
-	// Using :    Process each line of input (converting/calculating)
-	//************************************
+		//************************************
+		// Method:    InputProcess
+		// Returns:   std::string
+		// Parameter: string str
+		// Using :    Process each line of input (converting/calculating)
+		//************************************
 	string InputProcess(string str);
 
 	//************************************
@@ -198,10 +198,30 @@ private:
 	//************************************
 	string AddDigit0(int length);
 
+	//************************************
+	// Method:    Add
+	// Returns:   std::string
+	// Parameter: string numberA
+	// Parameter: string numberB
+	// Using :   Add 2 integer number in string
+	//************************************
 	string Add(string numberA, string numberB);
 
+	//************************************
+	// Method:    MultiplyByTwo
+	// Returns:   std::string
+	// Parameter: string number
+	// Parameter: int times
+	// Using :   Multiply a number by 2 n times
+	//************************************
 	string MultiplyByTwo(string number, int times);
 
+	//************************************
+	// Method:    DataToDec
+	// Returns:   std::string
+	// Parameter: QInt A
+	// Using :  convert Data in QInt back to integer
+	//************************************
 	string DataToDec(QInt A);
 
 	friend class QInt;

@@ -15,17 +15,22 @@ void Utilities::PrintQInt(QInt x)
 	string result = "0";
 
 	bool * arr = DecToBin(x);
+
 	string binary = "";
+
 	for ( int i = 0; i < MAX_BIT_LENGTH; i++ )
 	{
 		binary += ( arr[i] == 1 ) ? "1" : "0";
 	}
 
-	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
+	for ( int i = MAX_BIT_LENGTH - 1; i > 0; i-- )
 	{
 		if ( binary[i] == '1' )
 			result = Add(result, MultiplyByTwo("1", MAX_BIT_LENGTH - i - 1));
 	}
+
+	//Check negative
+	result = ( ( arr[0] == 1 ) ? "-" : "" ) + result;
 
 	cout << result;
 }
@@ -628,11 +633,14 @@ string Utilities::DataToDec(QInt A)
 	}
 
 	//convert to big int
-	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
+	for ( int i = MAX_BIT_LENGTH - 1; i > 0; i-- )
 	{
 		if ( binary[i] == '1' )
 			result = Add(result, MultiplyByTwo("1", MAX_BIT_LENGTH - i - 1));
 	}
+
+	result = ( ( arr[0] == 1 ) ? "-" : "" ) + result;
+
 	return result;
 
 }
