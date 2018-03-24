@@ -83,55 +83,53 @@ QInt QInt::operator+(const QInt & A)
 {
 	QInt result;
 
-	int remainder = 0;
+	int nho = 0;
 	for ( int i = 0; i < 32 * 4; i++ )
 	{
 		int o = 3 - i / 32;
 		int k = i % 32;
-
-		int numA, numB;
-		numA = A.data[o] >> k & 1;
-		numB = data[o] >> k & 1;
-
-		if ( ( i == MAX_BIT_LENGTH - 1 ) && ( remainder + numA + numB >= 2 ) )
+		int a1, b1;
+		a1 = A.data[o] >> k & 1;
+		b1 = data[o] >> k & 1;
+		if ( ( i == 127 ) && ( nho + a1 + b1 >= 2 ) )
 		{
 			cout << "Stackoverflow!!!!!!!";
 		}
 
-		if ( numA == 0 && numB == 0 && ( remainder == 1 ) )
+		if ( a1 == 0 && b1 == 0 && ( nho == 1 ) )
 		{
-			remainder = 0;
+			nho = 0;
 			result.data[o] = 1 << k | result.data[o];
 			continue;
 		}
 
-		if ( numA == 0 && numB == 0 && ( remainder == 1 ) )
+		if ( a1 == 0 && b1 == 0 && ( nho == 1 ) )
 		{
-			remainder = 1;
+			nho = 1;
 			result.data[o] = 1 << k | result.data[o];
 			continue;
 		}
-		if ( numA == 1 && numB == 1 && ( remainder == 0 ) )
+		if ( a1 == 1 && b1 == 1 && ( nho == 0 ) )
 		{
-			remainder = 1;
+			nho = 1;
 			result.data[o] = 0 << k | result.data[o];
 			continue;
 		}
-		if ( numA == 1 && numB == 1 && ( remainder == 1 ) )
+		if ( a1 == 1 && b1 == 1 && ( nho == 1 ) )
 		{
-			remainder = 1;
+			nho = 1;
 			result.data[o] = 1 << k | result.data[o];
 			continue;
 		}
-		if ( ( ( numA == 0 && numB == 1 ) || ( numA == 1 && numB == 0 ) ) && remainder == 1 )
+		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && nho == 1 )
 		{
-			remainder = 1;
+			nho = 1;
 			result.data[o] = 0 << k | result.data[o];
 			continue;
 		}
-		if ( ( ( numA == 0 && numB == 1 ) || ( numA == 1 && numB == 0 ) ) && remainder == 0 )
+		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && nho == 0 )
 		{
-			remainder = 0;
+			nho = 0;
 			result.data[o] = 1 << k | result.data[o];
 			continue;
 		}
@@ -154,7 +152,7 @@ QInt QInt::operator-(const QInt & A)
 
 }
 
-QInt QInt::operator*(const QInt & b)
+QInt QInt::operator*(const QInt & A)
 {
 	return QInt();
 }
@@ -166,51 +164,17 @@ QInt QInt::operator/(const QInt & A)
 
 QInt QInt::operator&(const QInt & A)
 {
-	QInt result;
-
-	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
-	{
-		int o = i / 32;
-		int k = 31 - i % 32;
-		if ( int(data[o] >> k & 1) == 1 && int(A.data[o] >> k & 1) == int(1) )
-		{
-			result.data[o] = result.data[o] | 1 << k;
-		}
-	}
-	return result;
+	return QInt();
 }
 
 QInt QInt::operator|(const QInt & A)
 {
-	QInt result;
-
-	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
-	{
-		int o = i / 32;
-		int k = 31 - i % 32;
-		if ( !( int(data[o] >> k & 1) == 0 && int(A.data[o] >> k & 1) == 0 ) )
-		{
-			result.data[o] = result.data[o] | 1 << k;
-		}
-	}
-
-	return result;
+	return QInt();
 }
 
 QInt QInt::operator^(const QInt & A)
 {
-	QInt result;
-
-	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
-	{
-		int o = i / 32;
-		int k = 31 - i % 32;
-		if ( int(data[o] >> k & 1) != int(A.data[o] >> k & 1) )
-		{
-			result.data[o] = result.data[o] | 1 << k;
-		}
-	}
-	return result;
+	return QInt();
 }
 
 QInt QInt::operator~()
