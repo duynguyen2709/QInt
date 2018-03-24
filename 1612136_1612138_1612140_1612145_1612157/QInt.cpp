@@ -219,67 +219,58 @@ QInt QInt::operator~()
 	return ( *this );
 }
 
-QInt QInt::operator<<(unsigned int bit)
+QInt QInt::operator<<(unsigned int numOfBit)
 {
+	if ( numOfBit >= MAX_BIT_LENGTH )
+		return QInt();
+
 	QInt result = *this;
-	for ( int i = 0; i < bit; i++ )
+
+	for ( int i = 0; i < numOfBit; i++ )
 	{
-		if ( ( result.data[1] >> 31 ) == 1 )
+		int *firstBit = new int[3];
+		int j = 0;
+
+		for ( j = 1; j <= 3; j++ )
+			firstBit[j] = ( result.data[j] >> 31 ) & 1;
+
+		for ( j = 0; j < 4; j++ )
+			result.data[j] <<= 1;
+
+		for ( j = 1; j <= 3; j++ )
 		{
-			result.data[0] <<= 1;
-			result.data[0] += 1;
+			if ( firstBit[j] == 1 )
+				result.data[j - 1] = 1 | result.data[j - 1];
 		}
-		else
-			result.data[0] <<= 1;
-		if ( ( result.data[2] >> 31 ) == 1 )
-		{
-			result.data[1] <<= 1;
-			result.data[1] += 1;
-		}
-		else
-			result.data[1] <<= 1;
-		if ( ( result.data[3] >> 31 ) == 1 )
-		{
-			result.data[2] <<= 1;
-			result.data[2] += 1;
-		}
-		else
-			result.data[2] <<= 1;
-		result.data[3] <<= 1;
 	}
+
 	return result;
 }
 
-QInt QInt::operator >> (unsigned int bit)
+QInt QInt::operator >> (unsigned int numOfBit)
 {
+	if ( numOfBit >= MAX_BIT_LENGTH )
+		return QInt();
+
 	QInt result = *this;
-	for ( int i = 0; i < bit; i++ )
+
+	for ( int i = 0; i < numOfBit; i++ )
 	{
-		if ( int(result.data[2] & 1) == int(1) )
-		{
-			result.data[3] >>= 1;
-			result.data[3] = result.data[3] | ( 1 << 31 );
-		}
-		else
-			result.data[3] >>= 1;
+		int *lastBit = new int[3];
+		int j = 0;
 
-		if ( result.data[1] & 1 == 1 )
-		{
-			result.data[2] >>= 1;
-			result.data[2] = result.data[2] | ( 1 << 31 );
-		}
-		else
-			result.data[2] >>= 1;
+		for ( j = 0; j < 3; j++ )
+			lastBit[j] = result.data[j] & 1;
 
-		if ( result.data[0] & 1 == 1 )
-		{
-			result.data[1] >>= 1;
-			result.data[1] = result.data[1] | ( 1 << 31 );
-		}
-		else
-			result.data[1] >>= 1;
+		for ( j = 0; j < 4; j++ )
+			result.data[j] >>= 1;
 
-		result.data[0] >>= 1;
+		for ( j = 0; j < 3; j++ )
+		{
+			if ( lastBit[j] == 1 )
+				result.data[j + 1] = ( 1 << 31 ) | result.data[j + 1];
+		}
 	}
+
 	return result;
 }

@@ -9,7 +9,7 @@ using namespace std;
 class QInt
 {
 private:
-	_int32 data[4];
+	unsigned int data[4];
 
 	//************************************
 	// Method:    splitNumber
@@ -37,8 +37,8 @@ public:
 	QInt operator^(const QInt &A);
 	QInt operator~();
 
-	QInt operator<<(unsigned int bit);
-	QInt operator >> (unsigned int bit);
+	QInt operator<<(unsigned int numOfBit);
+	QInt operator >> (unsigned int numOfBit);
 
 	friend class Utilities;
 };
