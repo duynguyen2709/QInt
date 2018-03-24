@@ -556,11 +556,11 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 	}
 	else if ( operatorType == ">>" )
 	{
-		result = A >> B;
+		//result = A >> B;
 	}
 	else if ( operatorType == "<<" )
 	{
-		result = A << B;
+		//result = A << B;
 	}
 	return result;
 }

@@ -164,17 +164,51 @@ QInt QInt::operator/(const QInt & A)
 
 QInt QInt::operator&(const QInt & A)
 {
-	return QInt();
+	QInt result;
+
+	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
+	{
+		int o = i / 32;
+		int k = 31 - i % 32;
+		if ( int(data[o] >> k & 1) == 1 && int(A.data[o] >> k & 1) == int(1) )
+		{
+			result.data[o] = result.data[o] | 1 << k;
+		}
+	}
+	return result;
 }
 
 QInt QInt::operator|(const QInt & A)
 {
-	return QInt();
+	QInt result;
+
+	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
+	{
+		int o = i / 32;
+		int k = 31 - i % 32;
+		if ( !( int(data[o] >> k & 1) == 0 && int(A.data[o] >> k & 1) == 0 ) )
+		{
+			result.data[o] = result.data[o] | 1 << k;
+		}
+	}
+	return result;
 }
 
 QInt QInt::operator^(const QInt & A)
 {
-	return QInt();
+	QInt result;
+
+	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
+	{
+		int o = i / 32;
+		int k = 31 - i % 32;
+		if ( int(data[o] >> k & 1) != int(A.data[o] >> k & 1) )
+		{
+			result.data[o] = result.data[o] | 1 << k;
+		}
+	}
+
+	return result;
 }
 
 QInt QInt::operator~()
@@ -185,12 +219,67 @@ QInt QInt::operator~()
 	return ( *this );
 }
 
-QInt QInt::operator<<(const QInt & A)
+QInt QInt::operator<<(unsigned int bit)
 {
-	return QInt();
+	QInt result = *this;
+	for ( int i = 0; i < bit; i++ )
+	{
+		if ( ( result.data[1] >> 31 ) == 1 )
+		{
+			result.data[0] <<= 1;
+			result.data[0] += 1;
+		}
+		else
+			result.data[0] <<= 1;
+		if ( ( result.data[2] >> 31 ) == 1 )
+		{
+			result.data[1] <<= 1;
+			result.data[1] += 1;
+		}
+		else
+			result.data[1] <<= 1;
+		if ( ( result.data[3] >> 31 ) == 1 )
+		{
+			result.data[2] <<= 1;
+			result.data[2] += 1;
+		}
+		else
+			result.data[2] <<= 1;
+		result.data[3] <<= 1;
+	}
+	return result;
 }
 
-QInt QInt::operator >> (const QInt & A)
+QInt QInt::operator >> (unsigned int bit)
 {
-	return QInt();
+	QInt result = *this;
+	for ( int i = 0; i < bit; i++ )
+	{
+		if ( int(result.data[2] & 1) == int(1) )
+		{
+			result.data[3] >>= 1;
+			result.data[3] = result.data[3] | ( 1 << 31 );
+		}
+		else
+			result.data[3] >>= 1;
+
+		if ( result.data[1] & 1 == 1 )
+		{
+			result.data[2] >>= 1;
+			result.data[2] = result.data[2] | ( 1 << 31 );
+		}
+		else
+			result.data[2] >>= 1;
+
+		if ( result.data[0] & 1 == 1 )
+		{
+			result.data[1] >>= 1;
+			result.data[1] = result.data[1] | ( 1 << 31 );
+		}
+		else
+			result.data[1] >>= 1;
+
+		result.data[0] >>= 1;
+	}
+	return result;
 }

@@ -37,8 +37,8 @@ public:
 	QInt operator^(const QInt &A);
 	QInt operator~();
 
-	QInt operator<<(const QInt &A);
-	QInt operator >> (const QInt &A);
+	QInt operator<<(unsigned int bit);
+	QInt operator >> (unsigned int bit);
 
 	friend class Utilities;
 };
