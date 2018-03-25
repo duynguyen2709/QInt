@@ -509,15 +509,43 @@ string Utilities::InputProcess(string str)
 	}
 	else
 	{
+		QInt temp;
+
 		//calculate with operator
-		/*size_t thirdSpace = str.find(' ', secondSpace + 1);
+		size_t thirdSpace = str.find(' ', secondSpace + 1);
 
 		string numberA = str.substr(firstSpace + 1, secondSpace - firstSpace - 1);
 		string numberB = str.substr(thirdSpace + 1);
 
 		string operatorType = str.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
 
-		Calculate(A, B, operatorType);*/
+		QInt A(p1, numberA);
+		QInt B(p1, numberB);
+
+		if ( operatorType == "<<" )
+		{
+			int bit = stoi(numberB);
+			temp = A << bit;
+		}
+		else if ( operatorType == ">>" )
+		{
+			int bit = stoi(numberB);
+			temp = A >> bit;
+		}
+		else temp = Calculate(A, B, operatorType);
+
+		switch ( p1 )
+		{
+			case 2:
+				result = Trim0AtFirst(BoolArrayToString(DecToBin(temp), LengthOfBoolArray(DecToBin(temp))));
+				break;
+			case 10:
+				result = DataToDec(temp);
+				break;
+			case 16:
+				result = DecToHex(temp);
+				break;
+		}
 	}
 	return result;
 }
@@ -554,14 +582,7 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 	{
 		result = A ^ B;
 	}
-	else if ( operatorType == ">>" )
-	{
-		//result = A >> B;
-	}
-	else if ( operatorType == "<<" )
-	{
-		//result = A << B;
-	}
+
 	return result;
 }
 

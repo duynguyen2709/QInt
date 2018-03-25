@@ -25,8 +25,11 @@ public:
 	QInt(int base, string num);
 
 	~QInt();
-	bool operator==(const QInt &A);
+	bool isNegative();
+	QInt Abs();
 
+	bool operator==(const QInt &A);
+	bool operator>(const QInt & A);
 	QInt operator+(const QInt &A);
 	QInt operator-(const QInt &A);
 	QInt operator*(const QInt &A);

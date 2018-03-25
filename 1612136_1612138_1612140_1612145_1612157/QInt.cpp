@@ -67,7 +67,19 @@ QInt::QInt(int base, string num)
 }
 
 QInt::~QInt()
-{}
+{};
+
+bool QInt::isNegative()
+{
+	return ( ( data[0] >> 31 ) & 1 ) == 1 ? true : false;
+}
+
+QInt QInt::Abs()
+{
+	QInt result = *this;
+	result.data[0] &= ~( 1UL << 31 );
+	return result;
+}
 
 bool QInt::operator==(const QInt & A)
 {
@@ -79,82 +91,200 @@ bool QInt::operator==(const QInt & A)
 	return true;
 }
 
+bool QInt::operator>(const QInt & A)
+{
+	if ( *this == A )
+		return false;
+
+	bool is_A_Negative = ( (QInt) A ).isNegative();
+
+	bool is_This_Negative = isNegative();
+
+	// (*this < 0 && A > 0)
+	if ( is_This_Negative && !is_A_Negative )
+		return false;
+
+	// (*this > 0 && A < 0)
+	else if ( !is_This_Negative && is_A_Negative )
+		return true;
+
+	// (*this > 0 && A > 0)
+	else if ( !is_A_Negative && !is_This_Negative )
+	{
+		for ( int i = 0; i < 4; i++ )
+		{
+			if ( data[i] > A.data[i] )
+				return true;
+		}
+	}
+	else // (*this < 0 && A < 0)
+	{
+		for ( int i = 0; i < 4; i++ )
+		{
+			if ( data[i] < A.data[i] )
+				return true;
+		}
+	}
+
+	return false;
+}
+
 QInt QInt::operator+(const QInt & A)
 {
 	QInt result;
 
-	int nho = 0;
-	for ( int i = 0; i < 32 * 4; i++ )
+	bool is_A_Negative = ( (QInt) A ).isNegative();
+
+	bool is_This_Negative = isNegative();
+
+	int remainder = 0;
+	for ( int i = 0; i < MAX_BIT_LENGTH - 1; i++ )
 	{
-		int o = 3 - i / 32;
-		int k = i % 32;
+		int block = 3 - i / 32;
+		int bitPos = i % 32;
+
 		int a1, b1;
-		a1 = A.data[o] >> k & 1;
-		b1 = data[o] >> k & 1;
-		if ( ( i == 127 ) && ( nho + a1 + b1 >= 2 ) )
+		a1 = A.data[block] >> bitPos & 1;
+		b1 = data[block] >> bitPos & 1;
+		if ( ( i == 127 ) && ( remainder + a1 + b1 >= 2 ) )
 		{
 			cout << "Stackoverflow!!!!!!!";
+			return QInt(10, "0");
 		}
 
-		if ( a1 == 0 && b1 == 0 && ( nho == 1 ) )
+		if ( a1 == 0 && b1 == 0 && ( remainder == 1 ) )
 		{
-			nho = 0;
-			result.data[o] = 1 << k | result.data[o];
+			remainder = 0;
+			result.data[block] = 1 << bitPos | result.data[block];
 			continue;
 		}
 
-		if ( a1 == 0 && b1 == 0 && ( nho == 1 ) )
+		if ( a1 == 0 && b1 == 0 && ( remainder == 1 ) )
 		{
-			nho = 1;
-			result.data[o] = 1 << k | result.data[o];
+			remainder = 1;
+			result.data[block] = 1 << bitPos | result.data[block];
 			continue;
 		}
-		if ( a1 == 1 && b1 == 1 && ( nho == 0 ) )
+		if ( a1 == 1 && b1 == 1 && ( remainder == 0 ) )
 		{
-			nho = 1;
-			result.data[o] = 0 << k | result.data[o];
+			remainder = 1;
+			result.data[block] = 0 << bitPos | result.data[block];
 			continue;
 		}
-		if ( a1 == 1 && b1 == 1 && ( nho == 1 ) )
+		if ( a1 == 1 && b1 == 1 && ( remainder == 1 ) )
 		{
-			nho = 1;
-			result.data[o] = 1 << k | result.data[o];
+			remainder = 1;
+			result.data[block] = 1 << bitPos | result.data[block];
 			continue;
 		}
-		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && nho == 1 )
+		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && remainder == 1 )
 		{
-			nho = 1;
-			result.data[o] = 0 << k | result.data[o];
+			remainder = 1;
+			result.data[block] = 0 << bitPos | result.data[block];
 			continue;
 		}
-		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && nho == 0 )
+		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && remainder == 0 )
 		{
-			nho = 0;
-			result.data[o] = 1 << k | result.data[o];
+			remainder = 0;
+			result.data[block] = 1 << bitPos | result.data[block];
 			continue;
 		}
 
 	}
-
 	return result;
 
 }
 
 QInt QInt::operator-(const QInt & A)
 {
-	QInt result;
-	QInt notA = A;
-	~notA;
-	QInt add1(10, "1");
-	notA = notA + add1;
-	result = *this + notA;
+	if ( *this == A )
+		return QInt(10, "0");
+
+	QInt result = A;
+
+	bool is_A_Negative = ( (QInt) A ).isNegative();
+
+	bool is_This_Negative = isNegative();
+
+	// (*this > 0 && A < 0)
+	if ( !is_This_Negative && is_A_Negative )
+	{
+		result = result.Abs() + ( *this );
+	}
+
+	// (*this < 0 && A > 0)
+	else if ( is_This_Negative && !is_A_Negative )
+	{
+		result = result + ( *this ).Abs();
+
+		result.data[0] = ( 1 << 31 ) | result.data[0];
+	}
+
+	// (*this > 0 && A > 0)
+	else if ( !is_This_Negative && !is_A_Negative )
+	{
+		if ( *this > A )
+		{
+			result = ( *this ) + ( ~result + *( new QInt(10, "1") ) );
+		}
+		else
+		{
+			result = result - ( *this );
+			result.data[0] = ( 1 << 31 ) | result.data[0];
+		}
+	}
+
+	// (*this < 0 && A < 0)
+	else
+	{
+		if ( *this > A )
+		{
+			result = result.Abs() - ( *this ).Abs();
+		}
+		else
+		{
+			result = ( *this ).Abs() - result.Abs();
+			result.data[0] = ( 1 << 31 ) | result.data[0];
+		}
+	}
+
 	return result;
 
 }
 
-QInt QInt::operator*(const QInt & A)
+QInt QInt::operator*(const QInt &A)
 {
-	return QInt();
+	QInt result;
+
+	QInt temp = (QInt) A;
+
+	int block = 3;
+	int bitPos = 31;
+
+	for ( int i = 0; i < MAX_BIT_LENGTH; i++ )
+	{
+		int bit = ( temp.data[block] >> ( 31 - bitPos ) ) & 1;
+		if ( bit == 1 )
+			result = result + ( ( *this ) << i );
+
+		bitPos--;
+		if ( bitPos < 0 )
+		{
+			block--;
+			bitPos = 31;
+		}
+	}
+
+	bool is_A_Negative = ( (QInt) A ).isNegative();
+	bool is_This_Negative = isNegative();
+
+	if ( ( is_A_Negative && is_This_Negative ) || ( !is_A_Negative && !is_This_Negative ) )
+	{
+		result = result.Abs();
+	}
+	else result.data[0] = ( 1 << 31 ) | result.data[0];
+
+	return result;
 }
 
 QInt QInt::operator/(const QInt & A)
