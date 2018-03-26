@@ -7,7 +7,10 @@ int main()
 {
 	Utilities MainController;
 
-	MainController.FileProcess("INPUT.TXT");
+	//MainController.FileProcess("INPUT2.TXT");
 
+	QInt A(10, "100");
+	QInt B(10, "10");
+	MainController.PrintQInt(A - B);
 	return 0;
 }

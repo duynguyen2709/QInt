@@ -509,8 +509,6 @@ string Utilities::InputProcess(string str)
 	}
 	else
 	{
-		QInt temp;
-
 		//calculate with operator
 		size_t thirdSpace = str.find(' ', secondSpace + 1);
 
@@ -521,6 +519,7 @@ string Utilities::InputProcess(string str)
 
 		QInt A(p1, numberA);
 		QInt B(p1, numberB);
+		QInt temp;
 
 		if ( operatorType == "<<" )
 		{
@@ -534,6 +533,7 @@ string Utilities::InputProcess(string str)
 		}
 		else temp = Calculate(A, B, operatorType);
 
+		//convert QInt to Base p1
 		switch ( p1 )
 		{
 			case 2:
@@ -556,7 +556,17 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 
 	if ( operatorType == "+" )
 	{
-		result = A + B;
+		if ( A.isNegative() && !B.isNegative() )
+			result = B - A.Abs();
+		else if ( !A.isNegative() && B.isNegative() )
+			result = A - B.Abs();
+		else if ( A.isNegative() && B.isNegative() )
+		{
+			result = A + B;
+			result.data[0] = ( 1 << 31 ) | result.data[0];
+		}
+		else result = A + B;
+
 	}
 	else if ( operatorType == "-" )
 	{

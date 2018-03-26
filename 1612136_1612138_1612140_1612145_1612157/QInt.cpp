@@ -115,6 +115,8 @@ bool QInt::operator>(const QInt & A)
 		{
 			if ( data[i] > A.data[i] )
 				return true;
+			else if ( data[i] < A.data[i] )
+				return false;
 		}
 	}
 	else // (*this < 0 && A < 0)
@@ -133,10 +135,6 @@ QInt QInt::operator+(const QInt & A)
 {
 	QInt result;
 
-	bool is_A_Negative = ( (QInt) A ).isNegative();
-
-	bool is_This_Negative = isNegative();
-
 	int remainder = 0;
 	for ( int i = 0; i < MAX_BIT_LENGTH - 1; i++ )
 	{
@@ -146,9 +144,10 @@ QInt QInt::operator+(const QInt & A)
 		int a1, b1;
 		a1 = A.data[block] >> bitPos & 1;
 		b1 = data[block] >> bitPos & 1;
+
 		if ( ( i == 127 ) && ( remainder + a1 + b1 >= 2 ) )
 		{
-			cout << "Stackoverflow!!!!!!!";
+			cout << "NUMBER OVERFLOW !";
 			return QInt(10, "0");
 		}
 
