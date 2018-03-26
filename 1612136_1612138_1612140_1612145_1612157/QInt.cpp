@@ -1,6 +1,9 @@
 #include "QInt.h"
 #include "Utilities.h"
 
+QInt QInt::QINT_MAX(10, "0");
+QInt QInt::QINT_MIN(10, "0");
+
 QInt QInt::SplitNumber(string binary)
 {
 	QInt result;
@@ -23,6 +26,22 @@ QInt QInt::SplitNumber(string binary)
 		}
 	}
 	return result;
+}
+
+void QInt::InitializeLimits()
+{
+	string max = "0";
+	string min = "1";
+
+	for ( int i = 0; i < 127; i++ )
+	{
+		max += "1";
+		min += "1";
+	}
+
+	QINT_MAX = *( new QInt(2, max) );
+	QINT_MIN = *( new QInt(2, min) );
+
 }
 
 QInt::QInt()
@@ -190,20 +209,11 @@ QInt QInt::operator+(const QInt & A)
 
 QInt QInt::operator-(const QInt &A)
 {
-	QInt kq;
-	QInt b = (QInt) A;
-	b.data[0] = ~b.data[0];
-	b.data[1] = ~b.data[1];
-	b.data[2] = ~b.data[2];
-	b.data[3] = ~b.data[3];
-
-	QInt tmp;
-
-	tmp.data[3] = 1;
-	b = b + tmp;
-	kq = ( *this ) + b;
-	return kq;
+	QInt result = (QInt) A;
+	result = ( *this ) + ( ~result + *( new QInt(10, "1") ) );
+	return result;
 }
+
 QInt QInt::operator*(const QInt &A)
 {
 	QInt temp;

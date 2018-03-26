@@ -580,12 +580,65 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 			result = A + B;
 			result.data[0] = ( 1 << 31 ) | result.data[0];
 		}
-		else result = A + B;
+		else
+			result = A + B;
 
 	}
 	else if ( operatorType == "-" )
 	{
-		result = A - B;
+		if ( A == B )
+			return QInt(10, "0");
+
+		QInt result = B;
+
+		bool is_B_Negative = ( (QInt) B ).isNegative();
+
+		bool is_A_Negative = A.isNegative();
+
+		// (A > 0 && A < 0)
+		if ( !is_A_Negative && is_B_Negative )
+		{
+			result = result.Abs() + A;
+		}
+
+		// (A < 0 && A > 0)
+		else if ( is_A_Negative && !is_B_Negative )
+		{
+			result = result + A.Abs();
+
+			result.data[0] = ( 1 << 31 ) | result.data[0];
+		}
+
+		// (A > 0 && A > 0)
+		else if ( !is_A_Negative && !is_B_Negative )
+		{
+			if ( A > B )
+			{
+				result = A + ( ~result + *( new QInt(10, "1") ) );
+			}
+			else
+			{
+				result = result - A;
+				result.data[0] = ( 1 << 31 ) | result.data[0];
+			}
+		}
+
+		// (A < 0 && A < 0)
+		else
+		{
+			if ( A > B )
+			{
+				result = result.Abs() - A.Abs();
+			}
+			else
+			{
+				result = A.Abs() - result.Abs();
+				result.data[0] = ( 1 << 31 ) | result.data[0];
+			}
+		}
+
+		return result;
+
 	}
 	else if ( operatorType == "*" )
 	{

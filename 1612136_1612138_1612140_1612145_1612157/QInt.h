@@ -20,11 +20,15 @@ private:
 	QInt SplitNumber(string binary);
 
 public:
+	static QInt QINT_MAX;
+	static QInt QINT_MIN;
 
 	QInt();
 	QInt(int base, string num);
 
+	static void InitializeLimits();
 	~QInt();
+
 	bool isNegative();
 	QInt Abs();
 
