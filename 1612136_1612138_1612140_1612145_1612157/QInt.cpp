@@ -133,162 +133,166 @@ bool QInt::operator>(const QInt & A)
 
 QInt QInt::operator+(const QInt & A)
 {
-	QInt result;
+	QInt c;
 
-	int remainder = 0;
-	for ( int i = 0; i < MAX_BIT_LENGTH - 1; i++ )
+	int nho = 0;
+	for ( int i = 0; i < 32 * 4; i++ )
 	{
-		int block = 3 - i / 32;
-		int bitPos = i % 32;
-
+		int o = 3 - i / 32;
+		int k = i % 32;
 		int a1, b1;
-		a1 = A.data[block] >> bitPos & 1;
-		b1 = data[block] >> bitPos & 1;
+		a1 = data[o] >> k & 1;
+		b1 = A.data[o] >> k & 1;
 
-		if ( ( i == 127 ) && ( remainder + a1 + b1 >= 2 ) )
+		if ( a1 == 0 && b1 == 0 && ( nho == 1 ) )
 		{
-			cout << "NUMBER OVERFLOW !";
-			return QInt(10, "0");
-		}
-
-		if ( a1 == 0 && b1 == 0 && ( remainder == 1 ) )
-		{
-			remainder = 0;
-			result.data[block] = 1 << bitPos | result.data[block];
+			nho = 0;
+			c.data[o] = 1 << k | c.data[o];
 			continue;
 		}
 
-		if ( a1 == 0 && b1 == 0 && ( remainder == 1 ) )
+		if ( a1 == 0 && b1 == 0 && ( nho == 1 ) )
 		{
-			remainder = 1;
-			result.data[block] = 1 << bitPos | result.data[block];
+			nho = 1;
+			c.data[o] = 1 << k | c.data[o];
 			continue;
 		}
-		if ( a1 == 1 && b1 == 1 && ( remainder == 0 ) )
+		if ( a1 == 1 && b1 == 1 && ( nho == 0 ) )
 		{
-			remainder = 1;
-			result.data[block] = 0 << bitPos | result.data[block];
+			nho = 1;
+			c.data[o] = 0 << k | c.data[o];
 			continue;
 		}
-		if ( a1 == 1 && b1 == 1 && ( remainder == 1 ) )
+		if ( a1 == 1 && b1 == 1 && ( nho == 1 ) )
 		{
-			remainder = 1;
-			result.data[block] = 1 << bitPos | result.data[block];
+			nho = 1;
+			c.data[o] = 1 << k | c.data[o];
 			continue;
 		}
-		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && remainder == 1 )
+		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && nho == 1 )
 		{
-			remainder = 1;
-			result.data[block] = 0 << bitPos | result.data[block];
+			nho = 1;
+			c.data[o] = 0 << k | c.data[o];
 			continue;
 		}
-		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && remainder == 0 )
+		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && nho == 0 )
 		{
-			remainder = 0;
-			result.data[block] = 1 << bitPos | result.data[block];
+			nho = 0;
+			c.data[o] = 1 << k | c.data[o];
 			continue;
 		}
 
 	}
-	return result;
+
+	return c;
 
 }
 
-QInt QInt::operator-(const QInt & A)
+QInt QInt::operator-(const QInt &A)
 {
-	if ( *this == A )
-		return QInt(10, "0");
+	QInt kq;
+	QInt b = (QInt) A;
+	b.data[0] = ~b.data[0];
+	b.data[1] = ~b.data[1];
+	b.data[2] = ~b.data[2];
+	b.data[3] = ~b.data[3];
 
-	QInt result = A;
+	QInt tmp;
 
-	bool is_A_Negative = ( (QInt) A ).isNegative();
-
-	bool is_This_Negative = isNegative();
-
-	// (*this > 0 && A < 0)
-	if ( !is_This_Negative && is_A_Negative )
-	{
-		result = result.Abs() + ( *this );
-	}
-
-	// (*this < 0 && A > 0)
-	else if ( is_This_Negative && !is_A_Negative )
-	{
-		result = result + ( *this ).Abs();
-
-		result.data[0] = ( 1 << 31 ) | result.data[0];
-	}
-
-	// (*this > 0 && A > 0)
-	else if ( !is_This_Negative && !is_A_Negative )
-	{
-		if ( *this > A )
-		{
-			result = ( *this ) + ( ~result + *( new QInt(10, "1") ) );
-		}
-		else
-		{
-			result = result - ( *this );
-			result.data[0] = ( 1 << 31 ) | result.data[0];
-		}
-	}
-
-	// (*this < 0 && A < 0)
-	else
-	{
-		if ( *this > A )
-		{
-			result = result.Abs() - ( *this ).Abs();
-		}
-		else
-		{
-			result = ( *this ).Abs() - result.Abs();
-			result.data[0] = ( 1 << 31 ) | result.data[0];
-		}
-	}
-
-	return result;
-
+	tmp.data[3] = 1;
+	b = b + tmp;
+	kq = ( *this ) + b;
+	return kq;
 }
-
 QInt QInt::operator*(const QInt &A)
 {
-	QInt result;
+	QInt temp;
 
-	QInt temp = (QInt) A;
+	QInt result = *this;
 
-	int block = 3;
-	int bitPos = 31;
+	int k = 128;
+	int Q = 0;
 
-	for ( int i = 0; i < MAX_BIT_LENGTH; i++ )
+	while ( k > 0 )
 	{
-		int bit = ( temp.data[block] >> ( 31 - bitPos ) ) & 1;
-		if ( bit == 1 )
-			result = result + ( ( *this ) << i );
-
-		bitPos--;
-		if ( bitPos < 0 )
+		if ( int(result.data[3] & 1) == 1 && Q == 0 )
 		{
-			block--;
-			bitPos = 31;
+			temp = temp - A;
 		}
-	}
+		if ( ( int(result.data[3] & 1) == 0 ) && ( Q == 1 ) )
+		{
+			temp = temp + A;
+		}
 
-	bool is_A_Negative = ( (QInt) A ).isNegative();
-	bool is_This_Negative = isNegative();
+		Q = result.data[3] & 1;
+		result = result >> 1;
 
-	if ( ( is_A_Negative && is_This_Negative ) || ( !is_A_Negative && !is_This_Negative ) )
-	{
-		result = result.Abs();
+		if ( int(temp.data[3] & 1) == 1 )
+		{
+			result.data[0] = result.data[0] | ( 1 << 31 );
+		}
+		temp = temp >> 1;
+		if ( Q == 1 )
+			temp.data[0] = temp.data[0] | ( 1 << 31 );
+		k--;
+
 	}
-	else result.data[0] = ( 1 << 31 ) | result.data[0];
 
 	return result;
 }
 
 QInt QInt::operator/(const QInt & A)
 {
-	return QInt();
+	QInt quotient;
+
+	QInt result = ( *this ).Abs();
+
+	QInt divisor = ( (QInt) A ).Abs();
+
+	if ( divisor > result )
+		return QInt(10, "0");
+
+	if ( int(result.data[0] >> 31 & 1) == 1 )
+	{
+		quotient.data[0] = quotient.data[1] = quotient.data[2] = quotient.data[3] = UINT_MAX;
+	}
+
+	int k = 128;
+	while ( k > 0 )
+	{
+		quotient = quotient << 1;
+		if ( int(result.data[0] >> 31 & 1) == 1 )
+			quotient.data[3] = quotient.data[3] | 1;
+		result = result << 1;
+		if ( int(divisor.data[0] >> 31 & 1) == 1 )
+			quotient = quotient + divisor;
+		else
+			quotient = quotient - divisor;
+		if ( int(quotient.data[0] >> 31 & 1) == 1 )
+		{
+			if ( int(divisor.data[0] >> 31 & 1) == 1 )
+			{
+				quotient = quotient - divisor;
+			}
+			else
+				quotient = quotient + divisor;
+		}
+		else
+		{
+			result.data[3] = result.data[3] | 1;
+		}
+		k--;
+	}
+
+	bool is_A_Negative = ( (QInt) A ).isNegative();
+
+	bool is_This_Negative = ( *this ).isNegative();
+
+	if ( ( !is_This_Negative && is_A_Negative ) || ( is_This_Negative && !is_A_Negative ) )
+	{
+		result.data[0] = ( 1 << 31 ) | result.data[0];
+	}
+	return result;
 }
 
 QInt QInt::operator&(const QInt & A)
@@ -350,56 +354,67 @@ QInt QInt::operator~()
 
 QInt QInt::operator<<(unsigned int numOfBit)
 {
-	if ( numOfBit >= MAX_BIT_LENGTH )
-		return QInt();
-
-	QInt result = *this;
-
+	QInt a = *this;
 	for ( int i = 0; i < numOfBit; i++ )
 	{
-		int *firstBit = new int[3];
-		int j = 0;
-
-		for ( j = 1; j <= 3; j++ )
-			firstBit[j] = ( result.data[j] >> 31 ) & 1;
-
-		for ( j = 0; j < 4; j++ )
-			result.data[j] <<= 1;
-
-		for ( j = 1; j <= 3; j++ )
+		if ( ( a.data[1] >> 31 ) == 1 )
 		{
-			if ( firstBit[j] == 1 )
-				result.data[j - 1] = 1 | result.data[j - 1];
+			a.data[0] <<= 1;
+			a.data[0] += 1;
 		}
+		else
+			a.data[0] <<= 1;
+		if ( ( a.data[2] >> 31 ) == 1 )
+		{
+			a.data[1] <<= 1;
+			a.data[1] += 1;
+		}
+		else
+			a.data[1] <<= 1;
+		if ( ( a.data[3] >> 31 ) == 1 )
+		{
+			a.data[2] <<= 1;
+			a.data[2] += 1;
+		}
+		else
+			a.data[2] <<= 1;
+		a.data[3] <<= 1;
 	}
-
-	return result;
+	return a;
 }
 
 QInt QInt::operator >> (unsigned int numOfBit)
 {
-	if ( numOfBit >= MAX_BIT_LENGTH )
-		return QInt();
-
-	QInt result = *this;
+	QInt a = *this;
 
 	for ( int i = 0; i < numOfBit; i++ )
 	{
-		int *lastBit = new int[3];
-		int j = 0;
-
-		for ( j = 0; j < 3; j++ )
-			lastBit[j] = result.data[j] & 1;
-
-		for ( j = 0; j < 4; j++ )
-			result.data[j] >>= 1;
-
-		for ( j = 0; j < 3; j++ )
+		if ( int(a.data[2] & 1) == int(1) )
 		{
-			if ( lastBit[j] == 1 )
-				result.data[j + 1] = ( 1 << 31 ) | result.data[j + 1];
+			a.data[3] >>= 1;
+			a.data[3] = a.data[3] | ( 1 << 31 );
 		}
-	}
+		else
+			a.data[3] >>= 1;
 
-	return result;
+		if ( a.data[1] & 1 == 1 )
+		{
+			a.data[2] >>= 1;
+			a.data[2] = a.data[2] | ( 1 << 31 );
+		}
+		else
+			a.data[2] >>= 1;
+
+		if ( a.data[0] & 1 == 1 )
+		{
+			a.data[1] >>= 1;
+			a.data[1] = a.data[1] | ( 1 << 31 );
+		}
+		else
+			a.data[1] >>= 1;
+
+		a.data[0] >>= 1;
+	}
+	return a;
+
 }

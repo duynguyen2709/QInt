@@ -30,6 +30,7 @@ public:
 
 	bool operator==(const QInt &A);
 	bool operator>(const QInt & A);
+
 	QInt operator+(const QInt &A);
 	QInt operator-(const QInt &A);
 	QInt operator*(const QInt &A);

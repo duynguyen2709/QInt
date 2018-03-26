@@ -7,10 +7,13 @@ int main()
 {
 	Utilities MainController;
 
-	//MainController.FileProcess("INPUT2.TXT");
+	MainController.FileProcess("INPUT2.TXT");
 
-	QInt A(10, "100");
-	QInt B(10, "10");
-	MainController.PrintQInt(A - B);
+	/*QInt A(10, "139565786721589715");
+	QInt B(10, "139565786762151");
+	QInt C = A / B;
+	MainController.PrintQInt(C);*/
+
+	cout << endl;
 	return 0;
 }
