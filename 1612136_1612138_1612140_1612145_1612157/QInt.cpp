@@ -252,6 +252,15 @@ QInt QInt::operator/(const QInt & A)
 	if ( divisor > result )
 		return QInt(10, "0");
 
+	if ( (QInt) A == QInt(10, "1") )
+		return ( *this );
+
+	if ( (QInt) A == QInt(10, "0") )
+	{
+		cout << "DIVIDE BY 0";
+		return QInt(10, "0");
+	}
+
 	if ( int(result.data[0] >> 31 & 1) == 1 )
 	{
 		quotient.data[0] = quotient.data[1] = quotient.data[2] = quotient.data[3] = UINT_MAX;
