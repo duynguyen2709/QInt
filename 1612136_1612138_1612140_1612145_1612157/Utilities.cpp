@@ -557,9 +557,24 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 	if ( operatorType == "+" )
 	{
 		if ( A.isNegative() && !B.isNegative() )
-			result = B - A.Abs();
+		{
+			if ( A.Abs() > B )
+			{
+				result = A.Abs() - B;
+				result.data[0] = ( 1 << 31 ) | result.data[0];
+			}
+			else result = B - A.Abs();
+		}
 		else if ( !A.isNegative() && B.isNegative() )
-			result = A - B.Abs();
+		{
+			if ( B.Abs() > A )
+			{
+				result = B.Abs() - A;
+				result.data[0] = ( 1 << 31 ) | result.data[0];
+			}
+			else
+				result = A - B.Abs();
+		}
 		else if ( A.isNegative() && B.isNegative() )
 		{
 			result = A + B;
