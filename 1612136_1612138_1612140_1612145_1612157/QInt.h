@@ -29,7 +29,18 @@ public:
 	static void InitializeLimits();
 	~QInt();
 
+	//************************************
+	// Method:    isNegative
+	// Returns:   bool
+	// Using :    check if QInt is negative or not
+	//************************************
 	bool isNegative();
+
+	//************************************
+	// Method:    Abs
+	// Returns:   QInt
+	// Using :  return absolute value of QInt
+	//************************************
 	QInt Abs();
 
 	bool operator==(const QInt &A);
