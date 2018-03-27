@@ -272,18 +272,6 @@ QInt QInt::operator/(const QInt & A)
 
 	QInt divisor = ( (QInt) A ).Abs();
 
-	if ( divisor > result )
-		return QInt(10, "0");
-
-	if ( (QInt) A == QInt(10, "1") )
-		return ( *this );
-
-	if ( (QInt) A == QInt(10, "0") )
-	{
-		cout << "DIVIDE BY 0";
-		return QInt(10, "0");
-	}
-
 	if ( int(result.data[0] >> 31 & 1) == 1 )
 	{
 		quotient.data[0] = quotient.data[1] = quotient.data[2] = quotient.data[3] = UINT_MAX;
@@ -316,14 +304,6 @@ QInt QInt::operator/(const QInt & A)
 		k--;
 	}
 
-	bool is_A_Negative = ( (QInt) A ).isNegative();
-
-	bool is_This_Negative = ( *this ).isNegative();
-
-	if ( ( !is_This_Negative && is_A_Negative ) || ( is_This_Negative && !is_A_Negative ) )
-	{
-		result.data[0] = ( 1 << 31 ) | result.data[0];
-	}
 	return result;
 }
 

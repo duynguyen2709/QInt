@@ -676,11 +676,36 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 	}
 	else if ( operatorType == "*" )
 	{
-		result = A * B;
+		if ( A == QInt(10, "0") || B == QInt(10, "0") )
+			return QInt(10, "0");
+
+		result = A.Abs() * B.Abs();
+
+		if ( ( A.isNegative() && !B.isNegative() ) || ( !A.isNegative() && B.isNegative() ) )
+		{
+			result.data[0] = ( 1 << 31 ) | result.data[0];
+		}
+
 	}
 	else if ( operatorType == "/" )
 	{
-		result = A / B;
+		if ( B == QInt(10, "0") )
+		{
+			cout << "DIVIDE BY 0";
+			return QInt(10, "0");
+		}
+		if ( B == QInt(10, "1") )
+			return A;
+
+		if ( B.Abs() > A.Abs() )
+			return QInt(10, "0");
+
+		result = A.Abs() / B.Abs();
+
+		if ( ( !A.isNegative() && B.isNegative() ) || ( A.isNegative() && !B.isNegative() ) )
+		{
+			result.data[0] = ( 1 << 31 ) | result.data[0];
+		}
 	}
 	else if ( operatorType == "&" )
 	{
