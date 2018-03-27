@@ -55,6 +55,9 @@ QInt::QInt()
 
 QInt::QInt(int base, string num)
 {
+	if ( num == "" )
+		( *this ) = *( new QInt(10, "0") );
+
 	Utilities A;
 
 	for ( size_t i = 0; i < 4; i++ )
@@ -64,7 +67,15 @@ QInt::QInt(int base, string num)
 	if ( base == 10 )
 	{
 		if ( num[0] != '-' )
+		{
 			*this = SplitNumber(A.DecToBin(num));
+			int sign = ( data[0] >> 31 ) & 1;
+			if ( sign == 1 )
+			{
+				cout << "NUMBER OVERFLOW";
+				( *this ) = *( new QInt(10, "0") );
+			}
+		}
 		else
 		{
 			*this = SplitNumber(A.DecToBin(num.substr(1)));
@@ -76,7 +87,7 @@ QInt::QInt(int base, string num)
 		if ( num.length() <= MAX_BIT_LENGTH )
 			*this = A.BinToDec(A.StringToBinary(num));
 
-		else cout << "Overflow" << endl;
+		else cout << "NUMBER OVERFLOW" << endl;
 	}
 	else if ( base == 16 )
 	{
@@ -154,8 +165,8 @@ QInt QInt::operator+(const QInt & A)
 {
 	QInt c;
 
-	int nho = 0;
-	for ( int i = 0; i < 32 * 4; i++ )
+	int remainder = 0;
+	for ( int i = 0; i < MAX_BIT_LENGTH; i++ )
 	{
 		int o = 3 - i / 32;
 		int k = i % 32;
@@ -163,40 +174,40 @@ QInt QInt::operator+(const QInt & A)
 		a1 = data[o] >> k & 1;
 		b1 = A.data[o] >> k & 1;
 
-		if ( a1 == 0 && b1 == 0 && ( nho == 1 ) )
+		if ( a1 == 0 && b1 == 0 && ( remainder == 1 ) )
 		{
-			nho = 0;
+			remainder = 0;
 			c.data[o] = 1 << k | c.data[o];
 			continue;
 		}
 
-		if ( a1 == 0 && b1 == 0 && ( nho == 1 ) )
+		if ( a1 == 0 && b1 == 0 && ( remainder == 1 ) )
 		{
-			nho = 1;
+			remainder = 1;
 			c.data[o] = 1 << k | c.data[o];
 			continue;
 		}
-		if ( a1 == 1 && b1 == 1 && ( nho == 0 ) )
+		if ( a1 == 1 && b1 == 1 && ( remainder == 0 ) )
 		{
-			nho = 1;
+			remainder = 1;
 			c.data[o] = 0 << k | c.data[o];
 			continue;
 		}
-		if ( a1 == 1 && b1 == 1 && ( nho == 1 ) )
+		if ( a1 == 1 && b1 == 1 && ( remainder == 1 ) )
 		{
-			nho = 1;
+			remainder = 1;
 			c.data[o] = 1 << k | c.data[o];
 			continue;
 		}
-		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && nho == 1 )
+		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && remainder == 1 )
 		{
-			nho = 1;
+			remainder = 1;
 			c.data[o] = 0 << k | c.data[o];
 			continue;
 		}
-		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && nho == 0 )
+		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && remainder == 0 )
 		{
-			nho = 0;
+			remainder = 0;
 			c.data[o] = 1 << k | c.data[o];
 			continue;
 		}

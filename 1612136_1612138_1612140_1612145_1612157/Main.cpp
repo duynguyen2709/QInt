@@ -5,10 +5,11 @@ using namespace std;
 
 int main()
 {
-	//QInt::InitializeLimits();
+	QInt::InitializeLimits();
 
 	Utilities MainController;
-
+	MainController.PrintQInt(QInt::QINT_MAX);
+	cout << endl;
 	MainController.FileProcess("INPUT2.TXT");
 
 	cout << endl;

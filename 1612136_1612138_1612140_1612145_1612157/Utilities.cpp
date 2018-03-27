@@ -577,11 +577,28 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 		}
 		else if ( A.isNegative() && B.isNegative() )
 		{
-			result = A + B;
+			result = A.Abs() + B.Abs();
+
+			int sign = ( result.data[0] >> 31 ) & 1;
+
+			if ( sign == 1 )
+			{
+				cout << "NUMBER OVERFLOW ";
+				return QInt(10, "0");
+			}
 			result.data[0] = ( 1 << 31 ) | result.data[0];
 		}
 		else
+		{
 			result = A + B;
+			int sign = ( result.data[0] >> 31 ) & 1;
+
+			if ( sign == 1 )
+			{
+				cout << "NUMBER OVERFLOW ";
+				return QInt(10, "0");
+			}
+		}
 
 	}
 	else if ( operatorType == "-" )
