@@ -9,8 +9,6 @@ int main()
 
 	Utilities MainController;
 
-	//MainController.PrintQInt(QInt::QINT_MAX);
-
 	MainController.FileProcess("INPUT2.TXT");
 
 	cout << endl;
