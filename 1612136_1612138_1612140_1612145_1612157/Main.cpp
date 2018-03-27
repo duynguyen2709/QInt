@@ -8,7 +8,8 @@ int main()
 	Utilities::InitializeExpOfTwo();
 	QInt::InitializeLimits();
 
-	MainController.FileProcess("INPUT2.TXT");
+	MainController.FileProcess("INPUT.TXT");
 	cout << endl;
+
 	return 0;
 }

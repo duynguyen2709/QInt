@@ -483,7 +483,10 @@ string Utilities::Convert(int p1, int p2, string number)
 
 		case 10:
 			if ( p2 == 2 )
-				result = Trim0AtFirst(BoolArrayToString(DecToBin(A), LengthOfBoolArray(DecToBin(A))));
+			{
+				bool *bin = DecToBin(A);
+				result = Trim0AtFirst(BoolArrayToString(bin, LengthOfBoolArray(bin)));
+			}
 			else if ( p2 == 16 )
 				result = DecToHex(A);
 			break;
@@ -492,7 +495,8 @@ string Utilities::Convert(int p1, int p2, string number)
 			if ( p2 == 2 )
 			{
 				char *hex = DecToHex(A);
-				result = Trim0AtFirst(BoolArrayToString(HexToBin(hex), LengthOfBoolArray(HexToBin(hex))));
+				bool *bin = HexToBin(hex);
+				result = Trim0AtFirst(BoolArrayToString(bin, LengthOfBoolArray(bin)));
 
 			}
 			else if ( p2 == 10 )
@@ -507,62 +511,68 @@ string Utilities::Convert(int p1, int p2, string number)
 string Utilities::InputProcess(string str)
 {
 	string result = "";
-
-	int spaceCount = std::count(str.begin(), str.end(), ' ');
-
-	size_t firstSpace = str.find_first_of(' ');
-	size_t secondSpace = str.find(' ', firstSpace + 1);
-
-	int p1 = stoi(str.substr(0, firstSpace));
-
-	if ( spaceCount == 2 )
+	try
 	{
-		//converting from base p1 to p2
-		int p2 = stoi(str.substr(firstSpace + 1, secondSpace - firstSpace - 1));
+		int spaceCount = std::count(str.begin(), str.end(), ' ');
 
-		string number = str.substr(secondSpace + 1);
+		size_t firstSpace = str.find_first_of(' ');
+		size_t secondSpace = str.find(' ', firstSpace + 1);
 
-		result = Convert(p1, p2, number);
+		int p1 = stoi(str.substr(0, firstSpace));
+
+		if ( spaceCount == 2 )
+		{
+			//converting from base p1 to p2
+			int p2 = stoi(str.substr(firstSpace + 1, secondSpace - firstSpace - 1));
+
+			string number = str.substr(secondSpace + 1);
+
+			result = Convert(p1, p2, number);
+		}
+		else if ( spaceCount == 3 )
+		{
+			//calculate with operator
+			size_t thirdSpace = str.find(' ', secondSpace + 1);
+
+			string numberA = str.substr(firstSpace + 1, secondSpace - firstSpace - 1);
+			string numberB = str.substr(thirdSpace + 1);
+
+			string operatorType = str.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
+
+			QInt A(p1, numberA);
+			QInt B(p1, numberB);
+			QInt temp;
+
+			if ( operatorType == "<<" )
+			{
+				int bit = stoi(numberB);
+				temp = A << bit;
+			}
+			else if ( operatorType == ">>" )
+			{
+				int bit = stoi(numberB);
+				temp = A >> bit;
+			}
+			else temp = Calculate(A, B, operatorType);
+
+			//convert QInt to Base p1
+			switch ( p1 )
+			{
+				case 2:
+					result = Trim0AtFirst(BoolArrayToString(DecToBin(temp), LengthOfBoolArray(DecToBin(temp))));
+					break;
+				case 10:
+					result = DataToDec(temp);
+					break;
+				case 16:
+					result = DecToHex(temp);
+					break;
+			}
+		}
 	}
-	else
+	catch ( OverflowException &ex )
 	{
-		//calculate with operator
-		size_t thirdSpace = str.find(' ', secondSpace + 1);
-
-		string numberA = str.substr(firstSpace + 1, secondSpace - firstSpace - 1);
-		string numberB = str.substr(thirdSpace + 1);
-
-		string operatorType = str.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
-
-		QInt A(p1, numberA);
-		QInt B(p1, numberB);
-		QInt temp;
-
-		if ( operatorType == "<<" )
-		{
-			int bit = stoi(numberB);
-			temp = A << bit;
-		}
-		else if ( operatorType == ">>" )
-		{
-			int bit = stoi(numberB);
-			temp = A >> bit;
-		}
-		else temp = Calculate(A, B, operatorType);
-
-		//convert QInt to Base p1
-		switch ( p1 )
-		{
-			case 2:
-				result = Trim0AtFirst(BoolArrayToString(DecToBin(temp), LengthOfBoolArray(DecToBin(temp))));
-				break;
-			case 10:
-				result = DataToDec(temp);
-				break;
-			case 16:
-				result = DecToHex(temp);
-				break;
-		}
+		result = ex.Error();
 	}
 	return result;
 }
@@ -570,6 +580,7 @@ string Utilities::InputProcess(string str)
 QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 {
 	QInt result;
+	OverflowException ex;
 
 	if ( operatorType == "+" )
 	{
@@ -596,25 +607,17 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 		{
 			result = A.Abs() + B.Abs();
 
-			int sign = ( result.data[0] >> 31 ) & 1;
+			if ( (int) ( ( result.data[0] >> 31 ) & 1 ) == 1 )
+				throw ex;
 
-			if ( sign == 1 )
-			{
-				cout << "NUMBER OVERFLOW ";
-				return QInt(10, "0");
-			}
 			result.data[0] = ( 1 << 31 ) | result.data[0];
 		}
 		else
 		{
 			result = A + B;
-			int sign = ( result.data[0] >> 31 ) & 1;
 
-			if ( sign == 1 )
-			{
-				cout << "NUMBER OVERFLOW ";
-				return QInt(10, "0");
-			}
+			if ( (int) ( ( result.data[0] >> 31 ) & 1 ) == 1 )
+				throw ex;
 		}
 
 	}
@@ -629,38 +632,28 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 
 		bool is_A_Negative = A.isNegative();
 
-		// (A > 0 && A < 0)
+		// (A > 0 && B < 0)
 		if ( !is_A_Negative && is_B_Negative )
 		{
 			result = result.Abs() + A;
 
-			int sign = ( result.data[0] >> 31 ) & 1;
-
-			if ( sign == 1 )
-			{
-				cout << "NUMBER OVERFLOW ";
-				return QInt(10, "0");
-			}
+			if ( (int) ( ( result.data[0] >> 31 ) & 1 ) == 1 )
+				throw ex;
 
 		}
 
-		// (A < 0 && A > 0)
+		// (A < 0 && B > 0)
 		else if ( is_A_Negative && !is_B_Negative )
 		{
 			result = result + A.Abs();
 
-			int sign = ( result.data[0] >> 31 ) & 1;
-
-			if ( sign == 1 )
-			{
-				cout << "NUMBER OVERFLOW ";
-				return QInt(10, "0");
-			}
+			if ( (int) ( ( result.data[0] >> 31 ) & 1 ) == 1 )
+				throw ex;
 
 			result.data[0] = ( 1 << 31 ) | result.data[0];
 		}
 
-		// (A > 0 && A > 0)
+		// (A > 0 && B > 0)
 		else if ( !is_A_Negative && !is_B_Negative )
 		{
 			if ( A > B )
@@ -697,10 +690,8 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 			return QInt(10, "0");
 
 		if ( A.Abs() > QInt::QINT_MAX / B.Abs() )
-		{
-			cout << "NUMBER OVERFLOW ";
-			return QInt(10, "0");
-		}
+			throw ex;
+
 		result = A.Abs() * B.Abs();
 
 		if ( ( A.isNegative() && !B.isNegative() ) || ( !A.isNegative() && B.isNegative() ) )
@@ -758,14 +749,14 @@ string Utilities::Add(string numberA, string numberB)
 	string result = "";
 
 	int lengthA = numberA.length();
-	int lenghtB = numberB.length();
+	int length = numberB.length();
 
-	if ( lengthA < lenghtB )
-		numberA = AddDigit0(lenghtB - lengthA) + numberA;
+	if ( lengthA < length )
+		numberA = AddDigit0(length - lengthA) + numberA;
 	else
-		numberB = AddDigit0(lengthA - lenghtB) + numberB;
+		numberB = AddDigit0(lengthA - length) + numberB;
 
-	lengthA = lenghtB = numberA.length();
+	lengthA = length = numberA.length();
 	bool remainder = false;
 
 	for ( int i = lengthA - 1; i >= 0; i-- )
@@ -789,15 +780,6 @@ string Utilities::Add(string numberA, string numberB)
 		result = "1" + result;
 
 	return result;
-}
-
-string Utilities::MultiplyByTwo(string number, int times)
-{
-	for ( int i = 0; i < times; i++ )
-	{
-		number = Add(number, number);
-	}
-	return number;
 }
 
 string Utilities::DataToDec(QInt A)

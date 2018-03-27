@@ -55,6 +55,7 @@ QInt::QInt()
 
 QInt::QInt(int base, string num)
 {
+	OverflowException ex;
 	if ( num == "" )
 		( *this ) = *( new QInt(10, "0") );
 
@@ -72,8 +73,7 @@ QInt::QInt(int base, string num)
 			int sign = ( data[0] >> 31 ) & 1;
 			if ( sign == 1 )
 			{
-				cout << "NUMBER OVERFLOW";
-				( *this ) = *( new QInt(10, "0") );
+				throw ex;
 			}
 		}
 		else

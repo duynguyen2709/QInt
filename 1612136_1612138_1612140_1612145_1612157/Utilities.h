@@ -3,6 +3,7 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <exception>
 #include "QInt.h"
 
 using namespace std;
@@ -10,6 +11,24 @@ using namespace std;
 #define MAX_BIT_LENGTH 128
 
 class QInt;
+
+class OverflowException :public exception
+{
+private:
+	string error = "NUMBER OVERFLOW";
+public:
+	OverflowException()
+	{};
+
+	std::string Error() const throw( )
+	{
+		return error;
+	}
+	void Error(std::string val)
+	{
+		error = val;
+	}
+};
 
 class Utilities
 {
@@ -207,15 +226,6 @@ public:
 	// Using :   Add 2 integer number in string
 	//************************************
 	string Add(string numberA, string numberB);
-
-	//************************************
-	// Method:    MultiplyByTwo
-	// Returns:   std::string
-	// Parameter: string number
-	// Parameter: int times
-	// Using :   Multiply a number by 2 n times
-	//************************************
-	string MultiplyByTwo(string number, int times);
 
 	//************************************
 	// Method:    DataToDec
