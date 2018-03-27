@@ -9,6 +9,7 @@ QInt QInt::SplitNumber(string binary)
 	QInt result;
 
 	int digit0 = MAX_BIT_LENGTH - binary.length();
+
 	for ( int i = 0; i < digit0; i++ )
 	{
 		binary = "0" + binary;
@@ -70,11 +71,9 @@ QInt::QInt(int base, string num)
 		if ( num[0] != '-' )
 		{
 			*this = SplitNumber(A.DecToBin(num));
-			int sign = ( data[0] >> 31 ) & 1;
-			if ( sign == 1 )
-			{
+
+			if ( (int) ( ( data[0] >> 31 ) & 1 ) == 1 )
 				throw ex;
-			}
 		}
 		else
 		{
@@ -87,7 +86,8 @@ QInt::QInt(int base, string num)
 		if ( num.length() <= MAX_BIT_LENGTH )
 			*this = A.BinToDec(A.StringToBinary(num));
 
-		else cout << "NUMBER OVERFLOW" << endl;
+		else
+			throw ex;
 	}
 	else if ( base == 16 )
 	{
@@ -165,58 +165,58 @@ bool QInt::operator>(const QInt & A)
 
 QInt QInt::operator+(const QInt & A)
 {
-	QInt c;
+	QInt result;
 
 	int remainder = 0;
 	for ( int i = 0; i < MAX_BIT_LENGTH; i++ )
 	{
-		int o = 3 - i / 32;
-		int k = i % 32;
+		int block = 3 - i / 32;
+		int bitPos = i % 32;
 		int a1, b1;
-		a1 = data[o] >> k & 1;
-		b1 = A.data[o] >> k & 1;
+		a1 = data[block] >> bitPos & 1;
+		b1 = A.data[block] >> bitPos & 1;
 
 		if ( a1 == 0 && b1 == 0 && ( remainder == 1 ) )
 		{
 			remainder = 0;
-			c.data[o] = 1 << k | c.data[o];
+			result.data[block] = 1 << bitPos | result.data[block];
 			continue;
 		}
 
 		if ( a1 == 0 && b1 == 0 && ( remainder == 1 ) )
 		{
 			remainder = 1;
-			c.data[o] = 1 << k | c.data[o];
+			result.data[block] = 1 << bitPos | result.data[block];
 			continue;
 		}
 		if ( a1 == 1 && b1 == 1 && ( remainder == 0 ) )
 		{
 			remainder = 1;
-			c.data[o] = 0 << k | c.data[o];
+			result.data[block] = 0 << bitPos | result.data[block];
 			continue;
 		}
 		if ( a1 == 1 && b1 == 1 && ( remainder == 1 ) )
 		{
 			remainder = 1;
-			c.data[o] = 1 << k | c.data[o];
+			result.data[block] = 1 << bitPos | result.data[block];
 			continue;
 		}
 		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && remainder == 1 )
 		{
 			remainder = 1;
-			c.data[o] = 0 << k | c.data[o];
+			result.data[block] = 0 << bitPos | result.data[block];
 			continue;
 		}
 		if ( ( ( a1 == 0 && b1 == 1 ) || ( a1 == 1 && b1 == 0 ) ) && remainder == 0 )
 		{
 			remainder = 0;
-			c.data[o] = 1 << k | c.data[o];
+			result.data[block] = 1 << bitPos | result.data[block];
 			continue;
 		}
 
 	}
 
-	return c;
+	return result;
 
 }
 
@@ -281,13 +281,17 @@ QInt QInt::operator/(const QInt & A)
 	while ( k > 0 )
 	{
 		quotient = quotient << 1;
+
 		if ( int(result.data[0] >> 31 & 1) == 1 )
 			quotient.data[3] = quotient.data[3] | 1;
+
 		result = result << 1;
+
 		if ( int(divisor.data[0] >> 31 & 1) == 1 )
 			quotient = quotient + divisor;
 		else
 			quotient = quotient - divisor;
+
 		if ( int(quotient.data[0] >> 31 & 1) == 1 )
 		{
 			if ( int(divisor.data[0] >> 31 & 1) == 1 )
@@ -313,11 +317,12 @@ QInt QInt::operator&(const QInt & A)
 
 	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
 	{
-		int o = i / 32;
-		int k = 31 - i % 32;
-		if ( int(data[o] >> k & 1) == 1 && int(A.data[o] >> k & 1) == int(1) )
+		int block = i / 32;
+		int bitPos = 31 - i % 32;
+
+		if ( int(data[block] >> bitPos & 1) == 1 && int(A.data[block] >> bitPos & 1) == 1 )
 		{
-			result.data[o] = result.data[o] | 1 << k;
+			result.data[block] = result.data[block] | 1 << bitPos;
 		}
 	}
 	return result;
@@ -329,11 +334,12 @@ QInt QInt::operator|(const QInt & A)
 
 	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
 	{
-		int o = i / 32;
-		int k = 31 - i % 32;
-		if ( !( int(data[o] >> k & 1) == 0 && int(A.data[o] >> k & 1) == 0 ) )
+		int block = i / 32;
+		int bitPos = 31 - i % 32;
+
+		if ( !( int(data[block] >> bitPos & 1) == 0 && int(A.data[block] >> bitPos & 1) == 0 ) )
 		{
-			result.data[o] = result.data[o] | 1 << k;
+			result.data[block] = result.data[block] | 1 << bitPos;
 		}
 	}
 	return result;
@@ -345,11 +351,11 @@ QInt QInt::operator^(const QInt & A)
 
 	for ( int i = MAX_BIT_LENGTH - 1; i >= 0; i-- )
 	{
-		int o = i / 32;
-		int k = 31 - i % 32;
-		if ( int(data[o] >> k & 1) != int(A.data[o] >> k & 1) )
+		int block = i / 32;
+		int bitPos = 31 - i % 32;
+		if ( int(data[block] >> bitPos & 1) != int(A.data[block] >> bitPos & 1) )
 		{
-			result.data[o] = result.data[o] | 1 << k;
+			result.data[block] = result.data[block] | 1 << bitPos;
 		}
 	}
 
@@ -366,67 +372,70 @@ QInt QInt::operator~()
 
 QInt QInt::operator<<(unsigned int numOfBit)
 {
-	QInt a = *this;
+	QInt result = *this;
 	for ( int i = 0; i < numOfBit; i++ )
 	{
-		if ( ( a.data[1] >> 31 ) == 1 )
+		if ( ( result.data[1] >> 31 ) == 1 )
 		{
-			a.data[0] <<= 1;
-			a.data[0] += 1;
+			result.data[0] <<= 1;
+			result.data[0] += 1;
 		}
 		else
-			a.data[0] <<= 1;
-		if ( ( a.data[2] >> 31 ) == 1 )
+			result.data[0] <<= 1;
+
+		if ( ( result.data[2] >> 31 ) == 1 )
 		{
-			a.data[1] <<= 1;
-			a.data[1] += 1;
+			result.data[1] <<= 1;
+			result.data[1] += 1;
 		}
 		else
-			a.data[1] <<= 1;
-		if ( ( a.data[3] >> 31 ) == 1 )
+			result.data[1] <<= 1;
+
+		if ( ( result.data[3] >> 31 ) == 1 )
 		{
-			a.data[2] <<= 1;
-			a.data[2] += 1;
+			result.data[2] <<= 1;
+			result.data[2] += 1;
 		}
 		else
-			a.data[2] <<= 1;
-		a.data[3] <<= 1;
+			result.data[2] <<= 1;
+
+		result.data[3] <<= 1;
 	}
-	return a;
+	return result;
 }
 
 QInt QInt::operator >> (unsigned int numOfBit)
 {
-	QInt a = *this;
+	QInt result = *this;
 
 	for ( int i = 0; i < numOfBit; i++ )
 	{
-		if ( int(a.data[2] & 1) == int(1) )
+		if ( int(result.data[2] & 1) == int(1) )
 		{
-			a.data[3] >>= 1;
-			a.data[3] = a.data[3] | ( 1 << 31 );
+			result.data[3] >>= 1;
+			result.data[3] = result.data[3] | ( 1 << 31 );
 		}
 		else
-			a.data[3] >>= 1;
+			result.data[3] >>= 1;
 
-		if ( a.data[1] & 1 == 1 )
+		if ( result.data[1] & 1 == 1 )
 		{
-			a.data[2] >>= 1;
-			a.data[2] = a.data[2] | ( 1 << 31 );
+			result.data[2] >>= 1;
+			result.data[2] = result.data[2] | ( 1 << 31 );
 		}
 		else
-			a.data[2] >>= 1;
+			result.data[2] >>= 1;
 
-		if ( a.data[0] & 1 == 1 )
+		if ( result.data[0] & 1 == 1 )
 		{
-			a.data[1] >>= 1;
-			a.data[1] = a.data[1] | ( 1 << 31 );
+			result.data[1] >>= 1;
+			result.data[1] = result.data[1] | ( 1 << 31 );
 		}
 		else
-			a.data[1] >>= 1;
+			result.data[1] >>= 1;
 
-		a.data[0] >>= 1;
+		result.data[0] >>= 1;
 	}
-	return a;
+	return result;
 
 }

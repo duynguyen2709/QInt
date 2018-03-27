@@ -26,7 +26,13 @@ public:
 	QInt();
 	QInt(int base, string num);
 
+	//************************************
+	// Method:    InitializeLimits
+	// Returns:   void
+	// Using :    Initial the value of QINT_MAX & QINT_MIN
+	//************************************
 	static void InitializeLimits();
+
 	~QInt();
 
 	//************************************

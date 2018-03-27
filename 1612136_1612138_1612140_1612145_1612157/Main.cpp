@@ -2,14 +2,13 @@
 #include "QInt.h"
 using namespace std;
 
-int main()
+int main(int argc, char **argv)
 {
 	Utilities MainController;
 	Utilities::InitializeExpOfTwo();
 	QInt::InitializeLimits();
 
-	MainController.FileProcess("INPUT.TXT");
-	cout << endl;
+	MainController.FileProcess(argv[1], argv[2]);
 
 	return 0;
 }

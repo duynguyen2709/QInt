@@ -450,17 +450,20 @@ bool * Utilities::StringToBinary(string binaryString)
 	return result;
 }
 
-void Utilities::FileProcess(string inputFile)
+void Utilities::FileProcess(char * inputFile, char * outputFile)
 {
-	freopen(inputFile.c_str(), "rt", stdin);
+	freopen(inputFile, "rt", stdin);
+	freopen(outputFile, "wt", stdout);
 
 	while ( !cin.eof() )
 	{
 		string str;
 		getline(cin, str);
 
-		cout << InputProcess(str) << endl;
+		cout << InputProcess(str);
 
+		if ( !cin.eof() )
+			cout << endl;
 	}
 
 	_fcloseall();

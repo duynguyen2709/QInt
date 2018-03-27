@@ -35,6 +35,11 @@ class Utilities
 public:
 	static string ExponentOfTwo[128];
 
+	//************************************
+	// Method:    InitializeExpOfTwo
+	// Returns:   void
+	// Using :   Initialize the table consist of exponent-of-two values
+	//************************************
 	static void InitializeExpOfTwo();
 
 	Utilities();
@@ -45,9 +50,9 @@ public:
 	// Method:    FileProcess
 	// Returns:   void
 	// Parameter: string inputFile
-	// Using :    Handling Input File
+	// Using :    Handling File
 	//************************************
-	void FileProcess(string inputFile);
+	void FileProcess(char * inputFile, char * outputFile);
 
 	//************************************
 	// Method:    ScanQInt
