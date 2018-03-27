@@ -8,8 +8,9 @@ int main()
 	QInt::InitializeLimits();
 
 	Utilities MainController;
-	MainController.PrintQInt(QInt::QINT_MAX);
-	cout << endl;
+
+	//MainController.PrintQInt(QInt::QINT_MAX);
+
 	MainController.FileProcess("INPUT2.TXT");
 
 	cout << endl;

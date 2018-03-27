@@ -155,6 +155,8 @@ bool QInt::operator>(const QInt & A)
 		{
 			if ( data[i] < A.data[i] )
 				return true;
+			else if ( data[i] > A.data[i] )
+				return false;
 		}
 	}
 

@@ -616,12 +616,29 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 		if ( !is_A_Negative && is_B_Negative )
 		{
 			result = result.Abs() + A;
+
+			int sign = ( result.data[0] >> 31 ) & 1;
+
+			if ( sign == 1 )
+			{
+				cout << "NUMBER OVERFLOW ";
+				return QInt(10, "0");
+			}
+
 		}
 
 		// (A < 0 && A > 0)
 		else if ( is_A_Negative && !is_B_Negative )
 		{
 			result = result + A.Abs();
+
+			int sign = ( result.data[0] >> 31 ) & 1;
+
+			if ( sign == 1 )
+			{
+				cout << "NUMBER OVERFLOW ";
+				return QInt(10, "0");
+			}
 
 			result.data[0] = ( 1 << 31 ) | result.data[0];
 		}
@@ -640,7 +657,7 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 			}
 		}
 
-		// (A < 0 && A < 0)
+		// (A < 0 && B < 0)
 		else
 		{
 			if ( A > B )
