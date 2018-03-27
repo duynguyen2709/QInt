@@ -679,6 +679,11 @@ QInt Utilities::Calculate(QInt A, QInt B, string operatorType)
 		if ( A == QInt(10, "0") || B == QInt(10, "0") )
 			return QInt(10, "0");
 
+		if ( A.Abs() > QInt::QINT_MAX / B.Abs() )
+		{
+			cout << "NUMBER OVERFLOW ";
+			return QInt(10, "0");
+		}
 		result = A.Abs() * B.Abs();
 
 		if ( ( A.isNegative() && !B.isNegative() ) || ( !A.isNegative() && B.isNegative() ) )
