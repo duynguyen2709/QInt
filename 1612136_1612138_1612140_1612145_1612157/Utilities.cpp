@@ -26,7 +26,7 @@ void Utilities::PrintQInt(QInt x)
 	for ( int i = MAX_BIT_LENGTH - 1; i > 0; i-- )
 	{
 		if ( binary[i] == '1' )
-			result = Add(result, MultiplyByTwo("1", MAX_BIT_LENGTH - i - 1));
+			result = Add(result, Utilities::ExponentOfTwo[MAX_BIT_LENGTH - i - 1]);
 	}
 
 	//Check negative
@@ -325,6 +325,23 @@ bool* Utilities::HexToBin(char* hex)
 //-- UTILITIES FUNCTIONS
 //----------------------------------------------------------------------------
 ----------------------------------------------------------------------------*/
+
+string Utilities::ExponentOfTwo[128] = { "0" };
+
+void Utilities::InitializeExpOfTwo()
+{
+	Utilities A;
+
+	ExponentOfTwo[0] = "1";
+
+	for ( int i = 1; i < 128; i++ )
+	{
+		ExponentOfTwo[i] = A.Add(ExponentOfTwo[i - 1], ExponentOfTwo[i - 1]);
+	}
+}
+
+Utilities::Utilities()
+{};
 
 int Utilities::LengthOfBoolArray(bool* arr)
 {
@@ -799,7 +816,7 @@ string Utilities::DataToDec(QInt A)
 	for ( int i = MAX_BIT_LENGTH - 1; i > 0; i-- )
 	{
 		if ( binary[i] == '1' )
-			result = Add(result, MultiplyByTwo("1", MAX_BIT_LENGTH - i - 1));
+			result = Add(result, Utilities::ExponentOfTwo[MAX_BIT_LENGTH - i - 1]);
 	}
 
 	result = ( ( arr[0] == 1 ) ? "-" : "" ) + result;

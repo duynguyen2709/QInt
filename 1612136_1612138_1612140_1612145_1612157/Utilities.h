@@ -14,8 +14,11 @@ class QInt;
 class Utilities
 {
 public:
-	Utilities()
-	{};
+	static string ExponentOfTwo[128];
+
+	static void InitializeExpOfTwo();
+
+	Utilities();
 	~Utilities()
 	{};
 
