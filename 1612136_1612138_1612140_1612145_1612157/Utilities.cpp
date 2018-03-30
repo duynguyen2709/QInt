@@ -523,7 +523,32 @@ string Utilities::InputProcess(string str)
 
         int p1 = stoi(str.substr(0, firstSpace));
 
-        if ( spaceCount == 2 )
+        int notOperator = str.find_first_of('~');
+
+        if ( notOperator != string::npos )
+        {
+            string number = str.substr(notOperator + 1);
+
+            while ( number[0] == ' ' )
+                number.erase(number.begin());
+
+            QInt A(p1, number);
+            QInt temp = ~A;
+
+            switch ( p1 )
+            {
+                case 2:
+                    result = Trim0AtFirst(BoolArrayToString(DecToBin(temp), LengthOfBoolArray(DecToBin(temp))));
+                    break;
+                case 10:
+                    result = DataToDec(temp);
+                    break;
+                case 16:
+                    result = DecToHex(temp);
+                    break;
+            }
+        }
+        else if ( spaceCount == 2 )
         {
             //converting from base p1 to p2
             int p2 = stoi(str.substr(firstSpace + 1, secondSpace - firstSpace - 1));
